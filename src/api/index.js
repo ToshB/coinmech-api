@@ -53,7 +53,6 @@ module.exports = ({config}) => {
   router.use(cors());
   router.get('/events', (req, res) => {
     const accessToken = `${config.facebook.appId}|${config.facebook.secret}`;
-    console.log(`https://graph.facebook.com/v2.9/oslopinball/events?access_token=${accessToken}`);
     getEvents(accessToken)
       .then(prepareEvents)
       .then(events => res.send(events))
