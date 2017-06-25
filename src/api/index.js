@@ -9,7 +9,7 @@ const prepareEvents = ({data}) => {
   return data.reduce((acc, e) => {
     const eventDate = new Date(e.start_time);
     let description = e.description.slice(0, 300);
-    if (description.length < e.desxcription.length) {
+    if (description.length < e.description.length) {
       description += '...';
     }
     const event = {
@@ -30,23 +30,36 @@ const prepareEvents = ({data}) => {
   }, {now, upcoming: [], past: []});
 };
 
+const getEvents = accessToken => {
+  return fetch(`https://graph.facebook.com/v2.9/oslopinball/events?access_token=${accessToken}`)
+    .then(function (result) {
+      return result.json()
+        .then(data => {
+          if (!result.ok) {
+            console.error(data);
+            throw new Error(`${result.status} - ${result.statusText}`);
+          }
+          return data;
+        });
+    }, err => {
+      console.error(err);
+      throw new Error(`Error getting events: ${err.message}`);
+    });
+};
+
 module.exports = ({config}) => {
   const router = new express.Router();
 
   router.use(cors());
   router.get('/events', (req, res) => {
     const accessToken = `${config.facebook.appId}|${config.facebook.secret}`;
-    fetch(`https://graph.facebook.com/v2.9/oslopinball/events?access_token=${accessToken}`)
-      .then(function (res) {
-        return res.text();
-      })
-      .then(JSON.parse)
+    console.log(`https://graph.facebook.com/v2.9/oslopinball/events?access_token=${accessToken}`);
+    getEvents(accessToken)
       .then(prepareEvents)
-      .then(events => {
-        res.send(events);
-      })
+      .then(events => res.send(events))
       .catch(err => {
-        res.status(500).send({error: 'Feil ved henting av Facebook-events', err: err.toString()});
+        console.error(err);
+        res.status(500).send({error: 'Feil ved henting av Facebook-events'});
       });
   });
 

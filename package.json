@@ -5,7 +5,7 @@
   "author": "Torstein Bjørnstad (tosh@tosh.no)",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon -w ./src src/index.js"
+    "start": "env $(cat .env) nodemon -w ./src src/index.js"
   },
   "engines": {
     "node": "8.1.2"
