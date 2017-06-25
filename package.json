@@ -1,0 +1,22 @@
+{
+  "name": "oslopinball-api",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Torstein Bjørnstad (tosh@tosh.no)",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon -w ./src src/index.js"
+  },
+  "engines": {
+    "node": "8.1.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "moment": "^2.18.1",
+    "node-fetch": "^1.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
