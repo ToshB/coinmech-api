@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const initApi = require('./api');
 
@@ -10,6 +11,7 @@ const config = {
   }
 };
 
+app.use(bodyParser.json());
 app.use(initApi({config}));
 
 app.listen(config.port, function () {

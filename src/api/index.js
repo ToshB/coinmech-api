@@ -49,6 +49,16 @@ const getEvents = accessToken => {
 
 module.exports = ({config}) => {
   const router = new express.Router();
+  let players;
+
+  const init = () => {
+    players = [
+      {name: 'Emma', credits: 30},
+      {name: 'Torstein', credits: 60}
+    ];
+  };
+
+  init();
 
   router.use(cors());
   router.get('/events', (req, res) => {
@@ -60,6 +70,32 @@ module.exports = ({config}) => {
         console.error(err);
         res.status(500).send({error: 'Feil ved henting av Facebook-events'});
       });
+  });
+
+  router.get('/reset', (req, res) => {
+    init();
+    res.send(players);
+  });
+
+  router.post('/credits', (req, res) => {
+    const playerId = parseInt(req.body.data, 10);
+    const player = players[playerId];
+    const price = 10;
+    if(player.credits < price){
+      return res.send({
+        success: false,
+        credits: player.credits + 'kr',
+        name: player.name
+      })
+    }
+
+    player.credits-=10;
+
+    return res.send({
+      success: true,
+      credits: player.credits + 'kr',
+      name: player.name
+    });
   });
 
   return router;
