@@ -5,7 +5,8 @@ cache:
   yarn: true
   directories:
     - node_modules
-before_deploy: "npm run build"
+script:
+  - npm run build
 deploy:
   provider: heroku
   api_key: $HEROKU_AUTH_TOKEN
