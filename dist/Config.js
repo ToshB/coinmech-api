@@ -7,6 +7,10 @@ class Config {
             appId: process.env.FACEBOOK_APPID,
             secret: process.env.FACEBOOK_SECRET
         };
+        this.google = {
+            clientId: process.env.GOOGLE_CLIENTID,
+            clientSecret: process.env.GOOGLE_CLIENTSECRET
+        };
     }
 }
 exports.default = Config;

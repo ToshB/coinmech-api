@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const config_1 = require("./config");
 const deps_1 = require("./deps");
 const ApiController_1 = require("./ApiController");
+const AppController_1 = require("./AppController");
 class App {
     constructor() {
         this.express = express();
@@ -18,11 +19,8 @@ class App {
         this.express.use(bodyParser.json());
     }
     routes(deps) {
-        const apiC = new ApiController_1.default(deps);
-        this.express.use('/api', apiC.router);
-        // this.express.get('/', (_req: any, res: express.Response) =>
-        //   res.render('index', {title: 'Login', message: 'Login'})
-        // );
+        this.express.use('/api', new ApiController_1.default(deps).router);
+        this.express.use('/', new AppController_1.default(deps).router);
     }
     start() {
         this.express.listen(this.config.port, () => {

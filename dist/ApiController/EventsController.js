@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const moment = require("moment");
-moment.locale('nb');
 const express_1 = require("express");
 class EventsController {
     constructor(deps) {
         this.router = express_1.Router();
+        moment.locale('nb');
         this.facebookEventLoader = deps.facebookEventLoader;
         this.router.get('/', this.getEvents.bind(this));
     }
