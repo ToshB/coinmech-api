@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import Config from './config';
-import Deps from './deps';
+import Config from './Config';
+import Deps from './Deps';
 import ApiController from './ApiController';
 import AppController from './AppController';
 

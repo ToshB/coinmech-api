@@ -1,4 +1,4 @@
-import Deps from "../deps/index";
+import Deps from "../Deps";
 import {Router, Request, Response} from "express";
 import CreditsRepository from '../deps/CreditsRepository';
 
@@ -23,7 +23,5 @@ export default class CreditsController {
     const userId = parseInt(req.body.data, 10);
     this.creditsRepository.subtractAmount(userId, 10)
       .then(result => res.send(result));
-
-    return
   }
 };

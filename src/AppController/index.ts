@@ -1,4 +1,4 @@
-import Deps from "../deps/index";
+import Deps from "../Deps";
 import {Router, Request, Response} from "express";
 import * as google from 'googleapis';
 

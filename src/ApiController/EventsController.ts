@@ -1,7 +1,7 @@
 import * as moment from 'moment';
-import Deps from "../deps/index";
+import Deps from "../Deps";
 import {Router, Response} from "express";
-import FacebookEventLoader, {FacebookEventResponse} from "../deps/FacebookEventLoader";
+import FacebookEventLoader, {FacebookEventResponse} from "../Deps/FacebookEventLoader";
 
 interface WebEvent {
   name: string;

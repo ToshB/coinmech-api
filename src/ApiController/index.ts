@@ -1,4 +1,4 @@
-import Deps from "../deps/index";
+import Deps from "../Deps";
 import {Router, Response} from "express";
 import * as cors from 'cors';
 import EventsController from './EventsController';
