@@ -10,7 +10,7 @@
     "build": "tsc"
   },
   "engines": {
-    "node": ">=6.10.0"
+    "node": "8.2.1"
   },
   "dependencies": {
     "body-parser": "^1.17.2",
