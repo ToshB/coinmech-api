@@ -12,7 +12,7 @@ export default class Deps {
   constructor(config: Config) {
     this.config = config;
     this.creditsRepository = new CreditsRepository();
-    this.playerRepository = new PlayerRepository();
+    this.playerRepository = new PlayerRepository(config);
     this.facebookEventLoader = new FacebookEventLoader(config);
   }
 }
