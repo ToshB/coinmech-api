@@ -21,10 +21,7 @@ export default class ApiRouter {
       'openid', 'profile', 'email'
     ];
 
-    this.router.get('/', (_req: any, res: Response) => {
-        res.render('index', {title: 'Login', message: 'Login'});
-      }
-    );
+    this.router.get('/', (_req: any, res: Response) => res.send({}));
 
     this.router.get('/auth', (_req: any, res: Response) => {
         const url = this.oauth2Client.generateAuthUrl({

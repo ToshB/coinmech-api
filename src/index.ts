@@ -17,9 +17,7 @@ class App {
     this.routes(deps);
   }
 
-
   private middleware(): void {
-    this.express.set('view engine', 'pug');
     this.express.use(bodyParser.json());
   }
 

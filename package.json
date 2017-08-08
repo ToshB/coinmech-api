@@ -20,8 +20,7 @@
     "googleapis": "^20.1.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "node-fetch": "^1.7.1",
-    "pug": "^2.0.0-rc.2"
+    "node-fetch": "^1.7.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
