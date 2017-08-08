@@ -1,9 +1,7 @@
-language: node_js
-node_js:
-  - 6
-cache: yarn
 deploy:
-  provider: azure_web_apps
-  verbose: true
+  provider: heroku
+  app: oslopinball-api
+  api_key: $HEROKU_AUTH_TOKEN
+  skip_cleanup: true
 notifications:
   email: false
