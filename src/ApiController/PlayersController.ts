@@ -1,6 +1,6 @@
 import Deps from "../Deps";
 import {Router, Request, Response} from "express";
-import PlayerRepository from '../deps/PlayerRepository';
+import PlayerRepository from '../Deps/PlayerRepository';
 
 export default class PlayersController {
   public router: Router;
