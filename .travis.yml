@@ -7,10 +7,6 @@ cache:
     - node_modules
 script:
   - npm run build
-before_deploy:
-  - rm -rf node_modules
-  - rm -rf src
-  - rm -rf test
 deploy:
   provider: heroku
   api_key: $HEROKU_AUTH_TOKEN
