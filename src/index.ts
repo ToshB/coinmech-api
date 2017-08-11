@@ -3,7 +3,6 @@ import * as bodyParser from 'body-parser';
 import Config from './Config';
 import Deps from './Deps';
 import ApiController from './ApiController';
-import * as path from "path";
 
 class App {
   public express: express.Application;
@@ -22,8 +21,7 @@ class App {
   }
 
   private routes(deps: Deps): void {
-    this.express.use('/api', new ApiController(deps).router);
-    this.express.use(express.static(path.join(__dirname, '../../web/build')));
+    this.express.use('/', new ApiController(deps).router);
   }
 
   public start(): void {
