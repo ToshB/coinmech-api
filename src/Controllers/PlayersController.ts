@@ -18,7 +18,8 @@ export default class PlayersController {
 
   getPlayers(_req: Request, res: Response) {
     this.playerRepository.getAll()
-      .then(players => res.send({players}));
+      .then(players => res.send({players}))
+      .catch(e => res.status(500).send(e.message));
   }
 
   addPlayer(req: Request, res: Response) {
@@ -41,9 +42,10 @@ export default class PlayersController {
   }
 
   addFunds(req: Request, res: Response) {
-    const playerId = req.params.id;
+    const playerId: number = req.params.id;
     const {amount} = req.body;
-    this.playerRepository.addFunds(playerId, amount)
+    this.playerRepository.get(playerId)
+      .then(player => this.playerRepository.addFunds(player, amount))
       .then(player => res.send(player));
   }
 };

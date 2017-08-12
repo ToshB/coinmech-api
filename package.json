@@ -5,7 +5,7 @@
   "author": "Torstein Bjørnstad (tosh@tosh.no)",
   "license": "MIT",
   "scripts": {
-    "start": "env $(cat .env) nodemon",
+    "start": "env $(cat .env) nodemon | pino",
     "prebuild": "rm -rf dist",
     "build": "tsc"
   },
@@ -13,6 +13,7 @@
     "node": "8.2.1"
   },
   "dependencies": {
+    "@types/pg-connection-string": "^0.1.1",
     "body-parser": "^1.17.2",
     "cors": "^2.8.3",
     "express": "^4.15.3",
@@ -20,7 +21,9 @@
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "pg": "^7.1.0"
+    "pg": "^7.1.0",
+    "pg-connection-string": "^0.1.3",
+    "pino": "^4.7.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
@@ -30,6 +33,8 @@
     "@types/lodash": "^4.14.71",
     "@types/node-fetch": "^1.6.7",
     "@types/pg": "^6.1.43",
+    "@types/pino": "^4.7.0",
+    "eslint": "^4.4.1",
     "nodemon": "^1.11.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.4.2"
