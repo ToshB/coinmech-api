@@ -1,6 +1,6 @@
 exports.up = (pgm) => {
   pgm.createTable({name: 'transactions'}, {
-    id: {type: 'serial', primaryKey: true},
+    id: 'id',
     date: 'timestamptz NOT NULL DEFAULT now()',
     card_id: 'text NOT NULL',
     amount: 'numeric(15,2) NOT NULL',

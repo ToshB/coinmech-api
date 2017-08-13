@@ -1,6 +1,6 @@
 exports.up = (pgm) => {
   pgm.createTable({name: 'players'}, {
-    id: {type: 'serial', primaryKey: true},
+    id: 'id',
     name: 'text',
     email: 'text',
     card_id: 'text',

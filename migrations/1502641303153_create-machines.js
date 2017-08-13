@@ -1,6 +1,6 @@
 exports.up = (pgm) => {
   pgm.createTable({name: 'machines'}, {
-    id: {type: 'serial', primaryKey: true},
+    id: 'id',
     name: 'text',
     price: 'numeric(15,2) DEFAULT \'0.00\''
   });
