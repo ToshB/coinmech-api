@@ -1,5 +1,5 @@
-import Deps from "../Deps";
-import {Router, Request, Response} from "express";
+import Deps from '../Deps';
+import {Router, Request, Response} from 'express';
 import TransactionRepository from '../Deps/TransactionRepository';
 
 export default class TransactionsController {

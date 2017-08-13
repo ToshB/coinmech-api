@@ -1,5 +1,5 @@
-import Deps from "../Deps";
-import {Router, Request, Response} from "express";
+import Deps from '../Deps';
+import {Router, Request, Response} from 'express';
 import PlayerRepository from '../Deps/PlayerRepository';
 
 export default class PlayersController {
@@ -30,7 +30,7 @@ export default class PlayersController {
 
   deletePlayer(req: Request, res:Response) {
     const playerId = req.params.id;
-    this.playerRepository.delete(playerId)
+    this.playerRepository.remove(playerId)
       .then(() => res.send());
   }
 

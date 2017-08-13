@@ -1,4 +1,4 @@
-import {Pool, Client} from "pg";
+import {Pool, Client} from 'pg';
 import {Logger} from 'pino';
 
 export interface Player {
@@ -8,18 +8,30 @@ export interface Player {
   card_id: string;
   balance: number;
 }
+interface PlayerRepository {
+  add(player: Player): Promise<Player>;
+  update(id: number, player: Player): Promise<Player>;
+  addFunds(player: Player, amount: number): Promise<Player>;
+  remove(id: number): Promise<void>;
+  getAll() : Promise<Player[]>;
+  get(id: number): Promise<Player>;
+}
 
-export default class PlayerRepository {
-  constructor(readonly db: Pool, readonly logger: Logger) {
+export default PlayerRepository;
+
+export class DBPlayerRepository implements PlayerRepository {
+  private readonly db : Pool;
+  constructor(db: Pool, readonly logger: Logger) {
+    this.db = db;
   }
 
-  handleError = (e: Error) => {
+  private handleError = (e: Error) => {
     this.logger.error(e);
     throw new Error(`Error querying DB: ${e.message}`);
   };
 
   add(player: Player) {
-    const query = "INSERT INTO players(name, email, card_id) VALUES($1, $2, $3)";
+    const query = 'INSERT INTO players(name, email, card_id) VALUES($1, $2, $3)';
     const values = [player.name, player.email, player.card_id];
     return this.db.query(query, values)
       .then(res => res.rows[0] as Player)
@@ -27,8 +39,8 @@ export default class PlayerRepository {
   }
 
   update(id: number, player: Player) {
-    const query = "UPDATE players SET name=$1, email=$2, card_id=$3 WHERE id=$4 RETURNING *";
-    const values = [player.name, player.email, player.card_id, id];
+    const query = 'UPDATE players SET name=$2, email=$3, card_id=$4 WHERE id=$1 RETURNING *';
+    const values = [id, player.name, player.email, player.card_id];
     return this.db.query(query, values)
       .then(res => res.rows[0] as Player)
       .catch(this.handleError);
@@ -36,15 +48,15 @@ export default class PlayerRepository {
 
   addFunds(player: Player, amount: number) {
     const updateBalance = (client: Client) => {
-      const query = "UPDATE players SET balance=balance+$1 WHERE id=$2 RETURNING *";
-      const values = [amount, player.id];
+      const query = 'UPDATE players SET balance=balance+$2 WHERE id=$1 RETURNING *';
+      const values = [player.id, amount];
       return client.query(query, values)
         .then(res => res.rows[0] as Player)
         .catch(this.handleError);
     };
 
     const addTransaction = (client: Client) => {
-      const query = "INSERT INTO transactions(card_id, player_id, amount) VALUES($1, $2, $3)";
+      const query = 'INSERT INTO transactions(card_id, player_id, amount) VALUES($1, $2, $3)';
       const values = [player.card_id, player.id, amount];
       return client.query(query, values)
         .then(() => client)
@@ -52,7 +64,8 @@ export default class PlayerRepository {
     };
 
     return this.db.connect()
-      .then(client => addTransaction(client)
+      .then(client => client.query('BEGIN')
+        .then(() => addTransaction(client))
         .then(() => updateBalance(client))
         .then((player: Player) => {
           return client.query('COMMIT')
@@ -66,11 +79,11 @@ export default class PlayerRepository {
       .catch(this.handleError);
   }
 
-  delete(id: number) {
-    const query = "DELETE FROM players WHERE id=$1";
+  remove(id: number) {
+    const query = 'DELETE FROM players WHERE id=$1';
     const values = [id];
     return this.db.query(query, values)
-      .then(res => res.rows[0] as Player)
+      .then(() => Promise.resolve())
       .catch(this.handleError);
   }
 

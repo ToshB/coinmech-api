@@ -1,5 +1,5 @@
-import Deps from "../Deps";
-import {Router, Request, Response} from "express";
+import Deps from '../Deps';
+import {Router, Request, Response} from 'express';
 import CreditsRepository from '../Deps/CreditsRepository';
 
 export default class CreditsController {

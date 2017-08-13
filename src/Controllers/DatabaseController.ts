@@ -1,4 +1,4 @@
-import Deps from "../Deps/index";
+import Deps from '../Deps';
 import {Router} from 'express';
 
 class DatabaseController {

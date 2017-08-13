@@ -1,4 +1,4 @@
-import {Pool} from "pg";
+import {Pool} from 'pg';
 import {Logger} from 'pino';
 
 export interface Transaction {
