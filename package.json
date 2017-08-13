@@ -9,7 +9,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "jest",
-    "heroku-postbuild": "pg-migrate up"
+    "heroku-postbuild": "PGSSLMODE=require pg-migrate up"
   },
   "engines": {
     "node": "8.2.1"
