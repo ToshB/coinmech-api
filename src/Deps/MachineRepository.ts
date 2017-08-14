@@ -4,6 +4,7 @@ import {Logger} from 'pino';
 export interface Machine {
   id: number;
   name: string;
+  price: number;
 }
 
 export default class MachineRepository {
@@ -22,16 +23,16 @@ export default class MachineRepository {
   }
 
   add(machine: Machine) {
-    const query = 'INSERT INTO machines(name) VALUES($1)';
-    const values = [machine.name];
+    const query = 'INSERT INTO machines(name, price) VALUES($1, $2)';
+    const values = [machine.name, machine.price];
     return this.db.query(query, values)
       .then(res => res.rows[0] as Machine)
       .catch(this.handleError);
   }
 
   update(id: number, machine: Machine) {
-    const query = 'UPDATE machines SET name=$2 WHERE id=$1 RETURNING *';
-    const values = [id, machine.name];
+    const query = 'UPDATE machines SET name=$2, price=$3 WHERE id=$1 RETURNING *';
+    const values = [id, machine.name, machine.price];
     return this.db.query(query, values)
       .then(res => res.rows[0] as Machine)
       .catch(this.handleError);
