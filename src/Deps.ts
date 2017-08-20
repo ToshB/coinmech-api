@@ -4,6 +4,7 @@ import CreditsRepository from './Deps/CreditsRepository';
 import IPlayerRepository, {DBPlayerRepository} from './Deps/PlayerRepository';
 import TransactionRepository from './Deps/TransactionRepository';
 import MachineRepository from './Deps/MachineRepository';
+import CardRepository from './Deps/CardRepository';
 import Config from './Config';
 import pino = require('pino');
 
@@ -22,6 +23,7 @@ export default class Deps {
   playerRepository: IPlayerRepository;
   transactionRepository: TransactionRepository;
   machineRepository: MachineRepository;
+  cardRepository: CardRepository;
   config: Config;
   logger: pino.Logger;
 
@@ -32,6 +34,7 @@ export default class Deps {
     this.playerRepository = new DBPlayerRepository(this.database, this.logger);
     this.transactionRepository = new TransactionRepository(this.database, this.logger);
     this.machineRepository = new MachineRepository(this.database, this.logger);
+    this.cardRepository = new CardRepository(this.database, this.logger);
     this.config = config;
   }
 }

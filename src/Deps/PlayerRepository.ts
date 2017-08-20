@@ -15,6 +15,7 @@ interface PlayerRepository {
   remove(id: number): Promise<void>;
   getAll() : Promise<Player[]>;
   get(id: number): Promise<Player>;
+  getByCard(cardId: string): Promise<Player>;
 }
 
 export default PlayerRepository;
@@ -95,6 +96,12 @@ export class DBPlayerRepository implements PlayerRepository {
 
   get(id: number) {
     return this.db.query('SELECT * FROM players WHERE id=$1', [id])
+      .then(res => res.rows[0] as Player)
+      .catch(this.handleError);
+  }
+
+  getByCard(cardId: string) {
+    return this.db.query('SELECT * FROM players WHERE card_id=$1', [cardId])
       .then(res => res.rows[0] as Player)
       .catch(this.handleError);
   }

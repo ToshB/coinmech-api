@@ -6,10 +6,12 @@
   "license": "MIT",
   "scripts": {
     "start": "env $(cat .env) nodemon | pino",
+    "tstart": "concurrently 'npm run start' 'npm run tunnel'",
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "jest",
-    "heroku-postbuild": "PGSSLMODE=require pg-migrate up"
+    "heroku-postbuild": "PGSSLMODE=require pg-migrate up",
+    "tunnel": "lt --port 4000 --subdomain coinmech"
   },
   "engines": {
     "node": "8.2.1"
@@ -21,6 +23,7 @@
     "express": "^4.15.3",
     "googleapis": "^20.1.0",
     "isomorphic-fetch": "^2.2.1",
+    "localtunnel": "^1.8.3",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "node-pg-migrate": "^2.7.0",
@@ -40,6 +43,7 @@
     "@types/pg": "^6.1.43",
     "@types/pino": "^4.7.0",
     "@types/sinon": "^2.3.3",
+    "concurrently": "^3.5.0",
     "eslint": "^4.4.1",
     "hippie": "^0.5.1",
     "jest": "^20.0.4",

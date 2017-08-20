@@ -4,6 +4,8 @@ import * as cors from 'cors';
 import DatabaseController from './Controllers/DatabaseController';
 import CreditsController from './Controllers/CreditsController';
 import PlayersController from './Controllers/PlayersController';
+import CardsController from './Controllers/CardsController';
+import DeviceController from './Controllers/DeviceController';
 import TransactionsController from './Controllers/TransactionsController';
 import MachinesController from './Controllers/MachinesController';
 import LoginController from './Controllers/LoginController';
@@ -18,6 +20,8 @@ export default class ApiRouter {
     this.router.use('/db', new DatabaseController(deps).router);
     this.router.use('/credits', new CreditsController(deps).router);
     this.router.use('/players', new PlayersController(deps).router);
+    this.router.use('/cards', new CardsController(deps).router);
+    this.router.use('/device', new DeviceController(deps).router);
     this.router.use('/transactions', new TransactionsController(deps).router);
     this.router.use('/machines', new MachinesController(deps).router);
     this.router.use('/login', new LoginController(deps).router);
