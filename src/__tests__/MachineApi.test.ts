@@ -24,7 +24,7 @@ describe('MachineApi', () => {
   });
 
   it('returns list of machines', done => {
-    const machine = {id: 1, name: 'Star Wars Pro'};
+    const machine = {id: 1, name: 'Star Wars Pro', price: 0.00};
     db.add(machine);
 
     return server
@@ -44,7 +44,7 @@ describe('MachineApi', () => {
   });
 
   it('allows deleting machine', done => {
-    db.add({id: 1, name: 'Star Wars Pro'});
+    db.add({id: 1, name: 'Star Wars Pro', price: 0.00});
 
     return server
       .del('/machines/1')
@@ -53,7 +53,7 @@ describe('MachineApi', () => {
   })
 
   it('deletes machine', done => {
-    db.add({id: 1, name: 'Star Wars Pro'});
+    db.add({id: 1, name: 'Star Wars Pro', price: 0.00});
 
     return server
       .del('/machines/1')
