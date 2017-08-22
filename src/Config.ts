@@ -5,7 +5,8 @@ interface CoinmechConfig {
     clientId?: string;
     clientSecret?: string;
   };
-  adminPass: string;
+  adminUsername: string;
+  adminPassword: string;
   jwtHmacSecret: string;
 }
 
@@ -23,7 +24,8 @@ function readRequiredEnv(property: string) {
 }
 
 export default class Config {
-  adminPass: string;
+  adminPassword: string;
+  adminUsername: string;
   jwtHmacSecret: string;
   databaseURL: string;
   port: string;
@@ -36,7 +38,8 @@ export default class Config {
     this.databaseURL = config.databaseURL;
     this.port = config.port;
     this.google = config.google;
-    this.adminPass = config.adminPass;
+    this.adminUsername = config.adminUser;
+    this.adminPassword = config.adminPassword;
     this.jwtHmacSecret = config.jwtHmacSecret;
   }
 
@@ -48,7 +51,8 @@ export default class Config {
         clientSecret: readEnv('GOOGLE_CLIENTSECRET')
       },
       databaseURL: readRequiredEnv('DATABASE_URL'),
-      adminPass: readRequiredEnv('ADMIN_PASSWORD'),
+      adminPassword: readRequiredEnv('ADMIN_PASSWORD'),
+      adminUsername: readRequiredEnv('ADMIN_USERNAME'),
       jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET')
     });
   }
