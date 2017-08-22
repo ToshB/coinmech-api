@@ -29,7 +29,7 @@ export default class DeviceController {
       .then(([card, player]) => res.send({
         cardId: card.id,
         balance: card.balance,
-        player: player ? player.name : null
+        name: player ? player.name : null
       }))
       .catch(e => res.status(500).send(e.message));
   }
