@@ -38,7 +38,7 @@ export default class Config {
     this.databaseURL = config.databaseURL;
     this.port = config.port;
     this.google = config.google;
-    this.adminUsername = config.adminUser;
+    this.adminUsername = config.adminUsername;
     this.adminPassword = config.adminPassword;
     this.jwtHmacSecret = config.jwtHmacSecret;
   }
