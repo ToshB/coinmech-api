@@ -12,7 +12,10 @@ export const verify = (done: DoneCallback) => (err: Error) => {
 export function getDefaultDeps() {
   const config = new Config({
     port: '',
-    databaseURL: 'url'
+    databaseURL: 'url',
+    adminUsername: 'user',
+    adminPassword: 'pass',
+    jwtHmacSecret: 'secret'
   });
 
   return new Deps(config);
