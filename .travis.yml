@@ -14,5 +14,3 @@ deploy:
   api_key: $HEROKU_AUTH_TOKEN
   skip_cleanup: true
   app: coinmech-api
-notifications:
-  email: false
