@@ -5,6 +5,7 @@ import Deps from '../Deps';
 const MongoInMemory = require('mongo-in-memory');
 const mongodb = require('mongodb');
 const hippie = require('hippie');
+let initialPort = 8000;
 
 export const verify = (done) => (err) => {
   return err ? done.fail(err) : done();
@@ -28,8 +29,8 @@ const testConfig = new Config({
   jwtHmacSecret: 'secret'
 });
 
-export function createTestServer() {
-  let mongoInMemory = new MongoInMemory('8000');
+export function createTestServer(dbName) {
+  let mongoInMemory = new MongoInMemory(initialPort++);
 
   function teardown() {
     return new Promise(resolve => {
@@ -45,7 +46,7 @@ export function createTestServer() {
   function initMongo() {
     return new Promise(resolve => {
       mongoInMemory.start(() => {
-        const connectionString = mongoInMemory.getMongouri("playersApiTest");
+        const connectionString = mongoInMemory.getMongouri("testDB");
         mongodb.connect(connectionString, function (err, db) {
           resolve(db);
         });
