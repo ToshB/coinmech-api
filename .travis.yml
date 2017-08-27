@@ -6,7 +6,6 @@ cache:
   directories:
     - node_modules
 script:
-  - npm test -- --forceExit
   - npm run build
 before_deploy:
   - rm -rf node_modules src
