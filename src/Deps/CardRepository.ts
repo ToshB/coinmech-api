@@ -17,7 +17,11 @@ export default class MachineRepository {
   };
 
   getAll() {
-    return this.db.query('SELECT * FROM cards ORDER BY last_seen desc')
+    return this.db.query('SELECT cards.*, players.name as player_name ' +
+      'FROM cards ' +
+      'LEFT JOIN players ' +
+      'ON cards.player_id = players.id ' +
+      'ORDER BY last_seen desc')
       .then(res => res.rows as Card[])
       .catch(this.handleError);
   }
@@ -29,6 +33,14 @@ export default class MachineRepository {
       'DO UPDATE SET last_seen = now() ' +
       'RETURNING *';
     const values = [cardId];
+    return this.db.query(query, values)
+      .then(res => res.rows[0] as Card)
+      .catch(this.handleError);
+  }
+
+  assignToPlayer(id: string, playerId?: number) {
+    const query = 'UPDATE cards SET player_id=$2 WHERE id=$1 RETURNING *';
+    const values = [id, playerId];
     return this.db.query(query, values)
       .then(res => res.rows[0] as Card)
       .catch(this.handleError);

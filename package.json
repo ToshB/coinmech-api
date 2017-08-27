@@ -20,6 +20,7 @@
     "@types/pg-connection-string": "^0.1.1",
     "body-parser": "^1.17.2",
     "cors": "^2.8.3",
+    "eventstore": "^1.12.3",
     "express": "^4.15.3",
     "googleapis": "^20.1.0",
     "isomorphic-fetch": "^2.2.1",

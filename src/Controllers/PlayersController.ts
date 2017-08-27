@@ -13,7 +13,7 @@ export default class PlayersController {
     this.router.post('/', this.addPlayer.bind(this));
     this.router.put('/:id', this.updatePlayer.bind(this));
     this.router.delete('/:id', this.deletePlayer.bind(this));
-    this.router.post('/:id/addFunds', this.addFunds.bind(this));
+    // this.router.post('/:id/addFunds', this.addFunds.bind(this));
   }
 
   getPlayers(_req: Request, res: Response) {
@@ -41,11 +41,11 @@ export default class PlayersController {
       .then(player => res.send(player));
   }
 
-  addFunds(req: Request, res: Response) {
-    const playerId: number = req.params.id;
-    const {amount} = req.body;
-    this.playerRepository.get(playerId)
-      .then(player => this.playerRepository.addFunds(player, amount))
-      .then(player => res.send(player));
-  }
+  // addFunds(req: Request, res: Response) {
+  //   const playerId: number = req.params.id;
+  //   const {amount} = req.body;
+  //   this.playerRepository.get(playerId)
+  //     .then(player => this.playerRepository.addFunds(player, amount))
+  //     .then(player => res.send(player));
+  // }
 };
