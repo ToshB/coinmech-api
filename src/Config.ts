@@ -1,6 +1,7 @@
 interface CoinmechConfig {
   port: string;
   databaseURL: string;
+  mongoURL: string;
   google?: {
     clientId?: string;
     clientSecret?: string;
@@ -28,6 +29,7 @@ export default class Config {
   adminUsername: string;
   jwtHmacSecret: string;
   databaseURL: string;
+  mongoURL: string;
   port: string;
   google?: {
     clientId?: string;
@@ -36,6 +38,7 @@ export default class Config {
 
   constructor(config: CoinmechConfig) {
     this.databaseURL = config.databaseURL;
+    this.mongoURL = config.mongoURL;
     this.port = config.port;
     this.google = config.google;
     this.adminUsername = config.adminUsername;
@@ -51,6 +54,7 @@ export default class Config {
         clientSecret: readEnv('GOOGLE_CLIENTSECRET')
       },
       databaseURL: readRequiredEnv('DATABASE_URL'),
+      mongoURL: readRequiredEnv('MONGO_URL'),
       adminPassword: readRequiredEnv('ADMIN_PASSWORD'),
       adminUsername: readRequiredEnv('ADMIN_USERNAME'),
       jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET')

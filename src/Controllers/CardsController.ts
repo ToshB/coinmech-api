@@ -13,7 +13,19 @@ export default class CardsController {
     this.cardRepository = deps.cardRepository;
     this.playerRepository = deps.playerRepository;
     this.router.get('/', this.getCards.bind(this));
+    this.router.post('/', this.scanCard.bind(this));
     this.router.post('/:id/assignToPlayer', this.assignCard.bind(this));
+  }
+
+  scanCard(req: Request, res: Response) {
+    const cardId = req.body.data;
+    this.cardRepository.addOrUpdate(cardId)
+      .then(card => res.send({
+        card,
+        player: null
+      }))
+      .catch(e => res.status(500).send(e.message));
+
   }
 
   getCards(_req: Request, res: Response) {
@@ -24,7 +36,7 @@ export default class CardsController {
 
   assignCard(req: Request, res: Response) {
     const cardId = req.params.id;
-    const playerId = req.body.player_id.length ? parseInt(req.body.player_id, 10) : undefined;
+    const playerId = req.body.player_id.length ? req.body.player_id : null;
     this.cardRepository.assignToPlayer(cardId, playerId)
       .then(card => res.send(card));
   }

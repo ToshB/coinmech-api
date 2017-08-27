@@ -11,6 +11,7 @@ export default class PlayersController {
     this.playerRepository = deps.playerRepository;
     this.router.get('/', this.getPlayers.bind(this));
     this.router.post('/', this.addPlayer.bind(this));
+    this.router.get('/:id', this.getPlayer.bind(this));
     this.router.put('/:id', this.updatePlayer.bind(this));
     this.router.delete('/:id', this.deletePlayer.bind(this));
     // this.router.post('/:id/addFunds', this.addFunds.bind(this));
@@ -19,7 +20,16 @@ export default class PlayersController {
   getPlayers(_req: Request, res: Response) {
     this.playerRepository.getAll()
       .then(players => res.send({players}))
-      .catch(e => res.status(500).send(e.message));
+      .catch(e => {
+        console.log(e);
+        res.status(500).send(e.message)
+      });
+  }
+
+  getPlayer(req: Request, res: Response) {
+    const playerId = req.params.id;
+    this.playerRepository.get(playerId)
+      .then(player => res.send(player));
   }
 
   addPlayer(req: Request, res: Response) {

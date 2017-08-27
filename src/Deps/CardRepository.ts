@@ -1,14 +1,27 @@
-import {Pool} from 'pg';
 import {Logger} from 'pino';
+import {Collection, Db} from 'mongodb';
+import {ObjectID} from 'bson';
+
+declare module 'mongodb' {
+  interface Collection {
+    findAndModify(a: any, b: any, c: any, d: any): any;
+  }
+}
 
 export interface Card {
-  id: string;
+  _id: string;
+  cardId: string;
   last_seen: Date;
   balance: number;
+  player_id: string;
 }
 
 export default class MachineRepository {
-  constructor(readonly db: Pool, readonly logger: Logger) {
+  private collection: Collection;
+
+  constructor(db: Db, readonly logger: Logger) {
+    this.collection = db.collection('cards');
+    this.collection.createIndex({cardId: 1}, {unique: true});
   }
 
   handleError = (e: Error) => {
@@ -16,33 +29,44 @@ export default class MachineRepository {
     throw new Error(`Error querying DB: ${e.message}`);
   };
 
-  getAll() {
-    return this.db.query('SELECT cards.*, players.name as player_name ' +
-      'FROM cards ' +
-      'LEFT JOIN players ' +
-      'ON cards.player_id = players.id ' +
-      'ORDER BY last_seen desc')
-      .then(res => res.rows as Card[])
+  addOrUpdate(cardId: string): Promise<Card> {
+    return this.collection
+      .findAndModify(
+        {cardId},
+        [],
+        {
+          $set: {cardId: cardId, last_seen: new Date()},
+          $setOnInsert: {balance: 0, player_id: null}
+        },
+        {
+          new: true,
+          upsert: true
+        }
+      )
+      .then((res: any) => res.value)
       .catch(this.handleError);
   }
 
-  check(cardId: string) {
-    const query = 'INSERT INTO cards(id, last_seen) ' +
-      'VALUES ($1, now()) ' +
-      'ON CONFLICT (id) ' +
-      'DO UPDATE SET last_seen = now() ' +
-      'RETURNING *';
-    const values = [cardId];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Card)
+  getAll(): Promise<Card[]> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find().toArray();
+      })
+      .then(res => res)
       .catch(this.handleError);
   }
 
-  assignToPlayer(id: string, playerId?: number) {
-    const query = 'UPDATE cards SET player_id=$2 WHERE id=$1 RETURNING *';
-    const values = [id, playerId];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Card)
+  assignToPlayer(id: string, playerId?: string): Promise<Card> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection
+          .findOneAndUpdate(
+            {_id: new ObjectID(id)},
+            {$set: {player_id: playerId}},
+            {returnOriginal: false}
+          );
+      })
+      .then(({value}) => value)
       .catch(this.handleError);
   }
 }

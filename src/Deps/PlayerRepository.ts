@@ -1,34 +1,23 @@
-import {Pool} from 'pg';
 import {Logger} from 'pino';
+import {Collection, Db, ObjectID} from 'mongodb';
+import {omit} from 'lodash';
 
 export interface Player {
-  id: number;
+  _id: string;
   name: string;
   email: string;
   balance: number;
 }
 
-export interface PlayerWithCardId extends Player{
+export interface PlayerWithCardId extends Player {
   card_id: string;
 }
 
-interface PlayerRepository {
-  add(player: Player): Promise<Player>;
-  update(id: number, player: Player): Promise<Player>;
-  // assignCard(id: number, cardId: string): Promise<Player>;
-  // addFunds(player: Player, amount: number): Promise<Player>;
-  remove(id: number): Promise<void>;
-  getAll() : Promise<Player[]>;
-  get(id: number): Promise<Player>;
-  getByCard(cardId: string): Promise<Player>;
-}
+export default class PlayerRepository {
+  private collection: Collection;
 
-export default PlayerRepository;
-
-export class DBPlayerRepository implements PlayerRepository {
-  private readonly db : Pool;
-  constructor(db: Pool, readonly logger: Logger) {
-    this.db = db;
+  constructor(db: Db, readonly logger: Logger) {
+    this.collection = db.collection('players');
   }
 
   private handleError = (e: Error) => {
@@ -37,80 +26,59 @@ export class DBPlayerRepository implements PlayerRepository {
   };
 
   add(player: Player) {
-    const query = 'INSERT INTO players(name, email) VALUES($1, $2)';
-    const values = [player.name, player.email];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Player)
+    return this.collection
+      .insertOne(player)
+      .then(({ops}) => ops[0] as Player)
       .catch(this.handleError);
   }
 
-  update(id: number, player: Player) {
-    const query = 'UPDATE players SET name=$2, email=$3 WHERE id=$1 RETURNING *';
-    const values = [id, player.name, player.email];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Player)
+  update(id: string, player: Player): Promise<Player> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection
+          .findOneAndUpdate(
+            {_id: new ObjectID(id)},
+            {$set: omit(player, '_id')},
+            {returnOriginal: false}
+          );
+      })
+      .then(({value}) => value)
       .catch(this.handleError);
   }
 
-  // addFunds(player: Player, amount: number) {
-  //   const updateBalance = (client: Client) => {
-  //     const query = 'UPDATE players SET balance=balance+$2 WHERE id=$1 RETURNING *';
-  //     const values = [player.id, amount];
-  //     return client.query(query, values)
-  //       .then(res => res.rows[0] as Player)
-  //       .catch(this.handleError);
-  //   };
-  //
-  //   const addTransaction = (client: Client) => {
-  //     const query = 'INSERT INTO transactions(card_id, player_id, amount) VALUES($1, $2, $3)';
-  //     const values = [player.card_id, player.id, amount];
-  //     return client.query(query, values)
-  //       .then(() => client)
-  //       .catch(this.handleError);
-  //   };
-  //
-  //   return this.db.connect()
-  //     .then(client => client.query('BEGIN')
-  //       .then(() => addTransaction(client))
-  //       .then(() => updateBalance(client))
-  //       .then((player: Player) => {
-  //         return client.query('COMMIT')
-  //           .then(() => player);
-  //       })
-  //       .catch((e: Error) => {
-  //         return client.query('ROLLBACK')
-  //           .then(() => this.handleError(e))
-  //       })
-  //     )
-  //     .catch(this.handleError);
-  // }
-
-  remove(id: number) {
-    const query = 'DELETE FROM players WHERE id=$1';
-    const values = [id];
-    return this.db.query(query, values)
-      .then(() => Promise.resolve())
+  remove(id: string): Promise<void> {
+    return this.collection
+      .deleteOne({_id: new ObjectID(id)})
+      .then(() => undefined)
       .catch(this.handleError);
   }
 
-  getAll() {
-    return this.db.query('SELECT players.*, cards.id as card_id FROM players ' +
-      'LEFT JOIN cards ON cards.player_id = players.id')
-      .then(res => res.rows as PlayerWithCardId[])
-      .catch(this.handleError);
+  getAll(): Promise<Player[]> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find().toArray();
+      })
+      .then(res => res)
+      .catch(this.handleError)
   }
 
-  get(id: number) {
-    return this.db.query('SELECT * FROM players WHERE id=$1', [id])
-      .then(res => res.rows[0] as Player)
+  get(id: number): Promise<Player> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find({_id: new ObjectID(id)}).toArray();
+      })
+      .then(res => {
+        return res[0];
+      })
       .catch(this.handleError);
   }
 
   getByCard(cardId: string) {
-    return this.db.query('SELECT players.* FROM players ' +
-      'LEFT JOIN cards ON cards.player_id = players.id' +
-      'WHERE cards.id=$1', [cardId])
-      .then(res => res.rows[0] as Player)
-      .catch(this.handleError);
+    return Promise.resolve({id: 1, name: 'hest', email: 'email', balance: 0});
+    // return this.db.query('SELECT players.* FROM players ' +
+    //   'LEFT JOIN cards ON cards.player_id = players.id' +
+    //   'WHERE cards.id=$1', [cardId])
+    //   .then(res => res.rows[0] as Player)
+    //   .catch(this.handleError);
   }
 }

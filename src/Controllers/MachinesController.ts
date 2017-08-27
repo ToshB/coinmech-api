@@ -11,6 +11,7 @@ export default class MachinesController {
     this.machineRepository = deps.machineRepository;
     this.router.get('/', this.getMachines.bind(this));
     this.router.post('/', this.addMachine.bind(this));
+    this.router.get('/:id', this.getMachine.bind(this));
     this.router.put('/:id', this.updateMachine.bind(this));
     this.router.delete('/:id', this.deleteMachine.bind(this));
   }
@@ -19,6 +20,12 @@ export default class MachinesController {
     this.machineRepository.getAll()
       .then(machines => res.send({machines}))
       .catch(e => res.status(500).send(e.message));
+  }
+
+  getMachine(req: Request, res: Response) {
+    const playerId = req.params.id;
+    this.machineRepository.get(playerId)
+      .then(machine => res.send(machine));
   }
 
   addMachine(req: Request, res: Response) {
@@ -35,8 +42,8 @@ export default class MachinesController {
   }
 
   deleteMachine(req: Request, res:Response) {
-    const machineId = parseInt(req.params.id, 10);
+    const machineId = req.params.id;
     this.machineRepository.remove(machineId)
-      .then(() => res.send());
+      .then(() => res.status(204).send({test: 'hest'}));
   }
 };

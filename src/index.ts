@@ -1,7 +1,11 @@
 import Config from './Config';
 import Server from './Server';
 import Deps from './Deps';
-const config = Config.fromEnv();
-const deps = new Deps(config);
+import {Db, MongoClient} from 'mongodb';
 
-new Server(deps).start();
+const config = Config.fromEnv();
+MongoClient.connect(config.mongoURL)
+  .then((db: Db) => {
+    const deps = new Deps(config, db);
+    new Server(deps).start()
+  });

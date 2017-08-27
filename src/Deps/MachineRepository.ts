@@ -1,14 +1,19 @@
-import {Pool} from 'pg';
 import {Logger} from 'pino';
+import {Collection, Db} from 'mongodb';
+import {ObjectID} from 'bson';
+import {assign, omit} from 'lodash';
 
 export interface Machine {
-  id: number;
+  _id: string;
   name: string;
   price: number;
 }
 
 export default class MachineRepository {
-  constructor(readonly db: Pool, readonly logger: Logger) {
+  private collection: Collection;
+
+  constructor(db: Db, readonly logger: Logger) {
+    this.collection = db.collection('machines');
   }
 
   handleError = (e: Error) => {
@@ -17,32 +22,51 @@ export default class MachineRepository {
   };
 
   getAll() {
-    return this.db.query('SELECT * FROM machines ORDER BY id desc')
-      .then(res => res.rows as Machine[])
-      .catch(this.handleError);
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find().toArray();
+      })
+      .then(res => res as Machine[])
+      .catch(this.handleError)
   }
 
   add(machine: Machine) {
-    const query = 'INSERT INTO machines(name, price) VALUES($1, $2)';
-    const values = [machine.name, machine.price];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Machine)
+    return this.collection
+      .insertOne(assign({price: 0}, machine))
+      .then(({ops}) => ops[0] as Machine)
       .catch(this.handleError);
   }
+
+  get(id: number) {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find({_id: new ObjectID(id)}).toArray();
+      })
+      .then(res => {
+        return res[0] as Machine;
+      })
+      .catch(this.handleError);
+  }
+
 
   update(id: number, machine: Machine) {
-    const query = 'UPDATE machines SET name=$2, price=$3 WHERE id=$1 RETURNING *';
-    const values = [id, machine.name, machine.price];
-    return this.db.query(query, values)
-      .then(res => res.rows[0] as Machine)
+    return Promise.resolve()
+      .then(() => {
+        return this.collection
+          .findOneAndUpdate(
+            {_id: new ObjectID(id)},
+            {$set: omit(machine, '_id')},
+            {returnOriginal: false}
+          );
+      })
+      .then(({value}) => value as Machine)
       .catch(this.handleError);
   }
 
-  remove(id: number) {
-    const query = 'DELETE FROM machines WHERE id=$1';
-    const values = [id];
-    return this.db.query(query, values)
-      .then(() => Promise.resolve())
+  remove(id: string): Promise<void> {
+    return this.collection
+      .deleteOne({_id: new ObjectID(id)})
+      .then(() => undefined)
       .catch(this.handleError);
   }
 }
