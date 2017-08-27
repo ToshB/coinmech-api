@@ -22,7 +22,6 @@ export const check = func => (res, body, next) => {
 
 const testConfig = new Config({
   port: '',
-  databaseURL: 'url',
   mongoURL: 'url',
   adminUsername: 'user',
   adminPassword: 'pass',
