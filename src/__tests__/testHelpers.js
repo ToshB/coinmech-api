@@ -29,7 +29,7 @@ const testConfig = new Config({
   jwtHmacSecret: 'secret'
 });
 
-export function createTestServer(dbName) {
+export function createTestServer() {
   let mongoInMemory = new MongoInMemory(initialPort++);
 
   function teardown() {

@@ -22,7 +22,6 @@ export default class ApiRouter {
     this.router.use('/cards', new CardsController(deps).router);
     this.router.use('/machines', new MachinesController(deps).router);
     this.router.use('/login', new LoginController(deps).router);
-
     // this.router.use('/credits', new CreditsController(deps).router);
 
     // this.router.use('/device', new DeviceController(deps).router);

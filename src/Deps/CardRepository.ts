@@ -1,6 +1,7 @@
 import {Logger} from 'pino';
 import {Collection, Db} from 'mongodb';
 import {ObjectID} from 'bson';
+import {Repository, RepositoryModel} from './Repository';
 
 declare module 'mongodb' {
   interface Collection {
@@ -8,26 +9,18 @@ declare module 'mongodb' {
   }
 }
 
-export interface Card {
-  _id: string;
+export interface Card extends RepositoryModel{
   cardId: string;
   last_seen: Date;
   balance: number;
   player_id: string;
 }
 
-export default class MachineRepository {
-  private collection: Collection;
-
-  constructor(db: Db, readonly logger: Logger) {
-    this.collection = db.collection('cards');
+export default class CardRepository extends Repository<Card> {
+  constructor(db: Db, logger: Logger) {
+    super('cards', db, logger);
     this.collection.createIndex({cardId: 1}, {unique: true});
   }
-
-  handleError = (e: Error) => {
-    this.logger.error(e);
-    throw new Error(`Error querying DB: ${e.message}`);
-  };
 
   addOrUpdate(cardId: string): Promise<Card> {
     return this.collection
@@ -44,15 +37,6 @@ export default class MachineRepository {
         }
       )
       .then((res: any) => res.value)
-      .catch(this.handleError);
-  }
-
-  getAll(): Promise<Card[]> {
-    return Promise.resolve()
-      .then(() => {
-        return this.collection.find().toArray();
-      })
-      .then(res => res)
       .catch(this.handleError);
   }
 
