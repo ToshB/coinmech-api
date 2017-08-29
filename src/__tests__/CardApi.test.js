@@ -70,7 +70,7 @@ describe('CardApi', () => {
         assert.match(body.cards[0], {cardId: 'CARD-ID', balance: 0});
       }))
       .end(verify(done));
-  })
+  });
 
   it('allows assigning card to player', done => {
     return server
@@ -86,7 +86,7 @@ describe('CardApi', () => {
           }))
           .end(verify(done));
       });
-  })
+  });
 
   it('allows unassigning card', done => {
     return server

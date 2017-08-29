@@ -5,7 +5,7 @@ import {Repository, RepositoryModel} from './Repository';
 
 declare module 'mongodb' {
   interface Collection {
-    findAndModify(a: any, b: any, c: any, d: any): any;
+    findAndModify<T>(a: any, b: any, c: any, d: any): Promise<{value: T}>;
   }
 }
 
@@ -24,7 +24,7 @@ export default class CardRepository extends Repository<Card> {
 
   addOrUpdate(cardId: string): Promise<Card> {
     return this.collection
-      .findAndModify(
+      .findAndModify<Card>(
         {cardId},
         [],
         {
@@ -36,7 +36,7 @@ export default class CardRepository extends Repository<Card> {
           upsert: true
         }
       )
-      .then((res: any) => res.value)
+      .then(res => res.value)
       .catch(this.handleError);
   }
 

@@ -1,30 +1,44 @@
 import Deps from '../Deps';
 import {Router, Request, Response} from 'express';
-import CardRepository from '../Deps/CardRepository';
+import CardRepository, {Card} from '../Deps/CardRepository';
 import PlayerRepository from '../Deps/PlayerRepository';
+import MachineRepository from '../Deps/MachineRepository';
+import TransactionService from '../Deps/TransactionService';
+import {BuyCreditEvent, LoadMoneyEvent} from '../Deps/Transactions';
 
 export default class CardsController {
   public router: Router;
   private cardRepository: CardRepository;
   private playerRepository: PlayerRepository;
+  private machineRepository: MachineRepository;
+  private transactionService: TransactionService;
 
   constructor(deps: Deps) {
     this.router = Router();
     this.cardRepository = deps.cardRepository;
     this.playerRepository = deps.playerRepository;
+    this.transactionService = deps.transactionService;
+    this.machineRepository = deps.machineRepository;
+
     this.router.get('/', this.getCards.bind(this));
     this.router.post('/', this.scanCard.bind(this));
     this.router.post('/:id/assignToPlayer', this.assignCard.bind(this));
+    this.router.post('/:id/loadMoney', this.loadMoney.bind(this));
+    this.router.post('/:id/buyCredit', this.buyCredit.bind(this));
   }
 
   scanCard(req: Request, res: Response) {
     const cardId = req.body.data;
     this.cardRepository.addOrUpdate(cardId)
-      .then(card => res.send({
-        card,
-        player: null
-      }))
-      .catch(e => res.status(500).send(e.message));
+      .then((card: Card) => {
+        if (card.player_id) {
+          this.playerRepository.get(card.player_id)
+            .then(player => res.send({card, player}));
+        } else {
+          res.send({card, player: null})
+        }
+      })
+      .catch((e: Error) => res.status(500).send(e.message));
 
   }
 
@@ -39,5 +53,34 @@ export default class CardsController {
     const playerId = req.body.player_id.length ? req.body.player_id : null;
     this.cardRepository.assignToPlayer(cardId, playerId)
       .then(card => res.send(card));
+  }
+
+  loadMoney(req: Request, res: Response) {
+    const cardId = req.params.id;
+    const playerId = req.body.playerId;
+    const amount = req.body.amount;
+
+    Promise.resolve()
+      .then(() => new LoadMoneyEvent(cardId, playerId, amount))
+      .then(transaction => this.transactionService.addTransaction(transaction))
+      .then(events => res.send(events))
+      .catch(err => res.status(400).send({error: err.message}));
+  }
+
+  buyCredit(req: Request, res: Response) {
+    const cardId = req.params.id;
+    const playerId = req.body.playerId;
+    const machineId = req.body.machineId;
+
+    this.machineRepository.get(machineId)
+      .then(machine => {
+        if(!machine){
+          throw new Error(`Machine with id ${machineId} not found`);
+        }
+        return new BuyCreditEvent(cardId, playerId, machine._id, machine.price)
+      })
+      .then(transaction => this.transactionService.addTransaction(transaction))
+      .then(events => res.send(events))
+      .catch(err => res.status(400).send({error: err.message}));
   }
 };

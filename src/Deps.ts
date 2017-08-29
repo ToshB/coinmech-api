@@ -4,11 +4,11 @@ import PlayerRepository from './Deps/PlayerRepository';
 import CardRepository from './Deps/CardRepository';
 import MachineRepository from './Deps/MachineRepository';
 // import CreditsRepository from './Deps/CreditsRepository';
-// import TransactionRepository from './Deps/TransactionRepository';
-
+import TransactionService from './Deps/TransactionService';
 
 import Config from './Config';
 import pino = require('pino');
+
 import {Db} from 'mongodb';
 
 export default class Deps {
@@ -16,7 +16,7 @@ export default class Deps {
   playerRepository: PlayerRepository;
   cardRepository: CardRepository;
   machineRepository: MachineRepository;
-  // transactionRepository: TransactionRepository;
+  transactionService: TransactionService;
 
   config: Config;
   logger: pino.Logger;
@@ -27,6 +27,7 @@ export default class Deps {
     this.playerRepository = new PlayerRepository(db, this.logger);
     this.cardRepository = new CardRepository(db, this.logger);
     this.machineRepository = new MachineRepository(db, this.logger);
+    this.transactionService = new TransactionService(config, this.logger);
     // this.creditsRepository = new CreditsRepository();
     // this.transactionRepository = new TransactionRepository(this.db, this.logger);
 

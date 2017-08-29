@@ -4,7 +4,7 @@ import {ObjectID} from 'bson';
 import {omit} from 'lodash';
 
 export interface RepositoryModel {
-  _id: string;
+  _id: ObjectID;
 }
 
 export abstract class Repository<T extends RepositoryModel> {
@@ -47,9 +47,12 @@ export abstract class Repository<T extends RepositoryModel> {
       .catch(this.handleError);
   }
 
-  get(id: number): Promise<T> {
+  get(id: string): Promise<T> {
     return Promise.resolve()
       .then(() => {
+        if(!ObjectID.isValid(id)){
+          throw new Error(`Invalid object id: ${id}`)
+        }
         return this.collection.find({_id: new ObjectID(id)}).toArray();
       })
       .then(res => {
