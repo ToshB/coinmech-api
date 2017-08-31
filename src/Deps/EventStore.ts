@@ -31,7 +31,7 @@ export interface EventStream<T> {
 
 export interface EventStore<T> {
   on(evt: string, cb: () => any): void;
-
+  defineEventMappings(mappings: object): void;
   init(): void;
 
   getEventStream(streamId: string, cb: (err: Error, stream: EventStream<T>) => void): void;

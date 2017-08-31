@@ -26,6 +26,11 @@ export default class TransactionService {
       console.log('connection to storage is gone');
     });
 
+    this.es.defineEventMappings({
+      id: 'id',
+      commitStamp: 'timestamp'
+    });
+
     this.es.init();
   }
 
@@ -51,7 +56,7 @@ export default class TransactionService {
   getAllTransactions() {
     return new Promise(resolve => {
       this.es.getEventStream(this.streamId, (err: Error, stream: EventStream<TransactionEvent>) => {
-        resolve(stream.events.map(e => e.payload));
+        resolve(stream.events.map(e => e.payload).reverse());
       });
     });
   }

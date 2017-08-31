@@ -72,12 +72,12 @@ export default class CardsController {
     const playerId = req.body.playerId;
     const machineId = req.body.machineId;
 
-    this.machineRepository.get(machineId)
-      .then(machine => {
-        if(!machine){
-          throw new Error(`Machine with id ${machineId} not found`);
-        }
-        return new BuyCreditEvent(cardId, playerId, machine._id, machine.price)
+    Promise.all([
+      this.playerRepository.get(playerId),
+      this.machineRepository.get(machineId)
+    ])
+      .then(([player, machine]) => {
+        return new BuyCreditEvent(cardId, player, machine)
       })
       .then(transaction => this.transactionService.addTransaction(transaction))
       .then(events => res.send(events))

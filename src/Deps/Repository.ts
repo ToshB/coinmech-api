@@ -4,7 +4,7 @@ import {ObjectID} from 'bson';
 import {omit} from 'lodash';
 
 export interface RepositoryModel {
-  _id: ObjectID;
+  _id?: ObjectID;
 }
 
 export abstract class Repository<T extends RepositoryModel> {
