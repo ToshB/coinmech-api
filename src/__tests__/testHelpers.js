@@ -21,14 +21,6 @@ export const check = func => (res, body, next) => {
   next(err);
 };
 
-const testConfig = new Config({
-  port: '',
-  mongoURL: 'url',
-  adminUsername: 'user',
-  adminPassword: 'pass',
-  jwtHmacSecret: 'secret'
-});
-
 export function createTestServer() {
   let mongoInMemory = new MongoInMemory(initialPort++);
 
@@ -56,7 +48,14 @@ export function createTestServer() {
 
   return initMongo()
     .then(db => {
-      const deps = new Deps(testConfig, db);
+      const config = new Config({
+        port: '',
+        mongoURL: mongoInMemory.getMongouri("testDB"),
+        adminUsername: 'user',
+        adminPassword: 'pass',
+        jwtHmacSecret: 'secret'
+      });
+      const deps = new Deps(config, db);
       const server = new Server(deps);
       return {
         express: server.express,

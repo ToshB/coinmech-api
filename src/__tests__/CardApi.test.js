@@ -1,4 +1,5 @@
 import * as hippie from "hippie";
+import * as ObjectID from "mongodb";
 
 const {verify, check, createTestServer} = require('./testHelpers');
 const {assert} = require('sinon');
@@ -50,12 +51,12 @@ describe('CardApi', () => {
       .send({data: 'CARD-ID'})
       .end((err, res, body) => {
         const _id = body.card._id;
-        const originalSeen = new Date(body.card.last_seen);
+        const originalSeen = new Date(body.card.lastSeen);
         return server
           .post('/cards')
           .send({data: 'CARD-ID'})
           .expect(check(body => {
-            const newSeen = new Date(body.card.last_seen);
+            const newSeen = new Date(body.card.lastSeen);
             assert.match(body.card, {_id, cardId: 'CARD-ID'});
             assert.match(newSeen > originalSeen, true);
           }))
@@ -78,11 +79,12 @@ describe('CardApi', () => {
       .send({data: 'NEW-CARD'})
       .end((err, res, body) => {
         const _id = body.card._id;
+        const playerId = '59a855328e8fc09e1d1039c5';
         return server
           .post(`/cards/${_id}/assignToPlayer`)
-          .send({player_id: 'player-id'})
+          .send({playerId: playerId})
           .expect(check(body => {
-            assert.match(body, {_id, cardId: 'NEW-CARD', player_id: 'player-id'});
+            assert.match(body, {_id, cardId: 'NEW-CARD', playerId});
           }))
           .end(verify(done));
       });
@@ -96,9 +98,9 @@ describe('CardApi', () => {
         const _id = body.card._id;
         return server
           .post(`/cards/${_id}/assignToPlayer`)
-          .send({player_id: ''})
+          .send({playerId: ''})
           .expect(check(body => {
-            assert.match(body, {_id, cardId: 'NEW-CARD', player_id: null});
+            assert.match(body, {_id, cardId: 'NEW-CARD', playerId: null});
           }))
           .end(verify(done));
       });

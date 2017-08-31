@@ -56,9 +56,9 @@ export default class DummyDataController {
       .then(([players, machines]) => {
         const cardPromises = players.map(player => this.cardRepository.add({
           cardId: cardId(),
-          last_seen: new Date(),
+          lastSeen: new Date(),
           balance: 0,
-          player_id: player._id.toString()
+          playerId: player._id.toString()
         }).then((card: Card) => ({player, card})));
 
         return Promise.all([

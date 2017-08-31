@@ -11,9 +11,9 @@ declare module 'mongodb' {
 
 export interface Card extends RepositoryModel{
   cardId: string;
-  last_seen: Date;
+  lastSeen: Date;
   balance: number;
-  player_id: string;
+  playerId: string;
 }
 
 export default class CardRepository extends Repository<Card> {
@@ -28,8 +28,8 @@ export default class CardRepository extends Repository<Card> {
         {cardId},
         [],
         {
-          $set: {cardId: cardId, last_seen: new Date()},
-          $setOnInsert: {balance: 0, player_id: null}
+          $set: {cardId: cardId, lastSeen: new Date()},
+          $setOnInsert: {balance: 0, playerId: null}
         },
         {
           new: true,
@@ -46,7 +46,7 @@ export default class CardRepository extends Repository<Card> {
         return this.collection
           .findOneAndUpdate(
             {_id: new ObjectID(id)},
-            {$set: {player_id: playerId}},
+            {$set: {playerId: playerId}},
             {returnOriginal: false}
           );
       })

@@ -31,8 +31,8 @@ export default class CardsController {
     const cardId = req.body.data;
     this.cardRepository.addOrUpdate(cardId)
       .then((card: Card) => {
-        if (card.player_id) {
-          this.playerRepository.get(card.player_id)
+        if (card.playerId) {
+          this.playerRepository.get(card.playerId)
             .then(player => res.send({card, player}));
         } else {
           res.send({card, player: null})
@@ -50,7 +50,7 @@ export default class CardsController {
 
   assignCard(req: Request, res: Response) {
     const cardId = req.params.id;
-    const playerId = req.body.player_id.length ? req.body.player_id : null;
+    const playerId = req.body.playerId.length ? req.body.playerId : null;
     this.cardRepository.assignToPlayer(cardId, playerId)
       .then(card => res.send(card));
   }
