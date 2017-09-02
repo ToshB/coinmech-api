@@ -6,6 +6,10 @@ interface Options {
   transactionsCollectionName: string;
   timeout: number;
   url: string;
+  options?: {
+    ssl?: boolean;
+    autoReconnect?: boolean;
+  };
 }
 
 export interface EsEvent<T> {
@@ -15,6 +19,7 @@ export interface EsEvent<T> {
 export interface EventStream<T> {
   events: EsEvent<T>[];
   eventsToDispatch: EsEvent<T>[];
+
   addEvent(event: T): void;
 
   addEvents(events: T[]): void;
@@ -27,10 +32,14 @@ export interface EventStream<T> {
 
 export interface EventStore<T> {
   getLastEvent(query: any, cb: (err: Error, event: EsEvent<T>) => void): void;
+
   on(evt: string, cb: () => any): void;
+
   defineEventMappings(mappings: object): void;
+
   useEventPublisher(handler: (event: T) => void): void;
-  init(): void;
+
+  init(cb?: (error: Error) => void): void;
 
   getEventStream(streamId: string, cb: (err: Error, stream: EventStream<T>) => void): void;
 

@@ -13,24 +13,26 @@ export default class TransactionService {
 
   constructor(readonly config: Config, bus: EventEmitter2, logger: Logger) {
     this.logger = logger.child({});
-    this.logger.info('Initializing TransactionService');
     this.es = createEventStore({
       type: 'mongodb',
       eventsCollectionName: 'transactions',             // optional
       transactionsCollectionName: 'esTransactions', // optional
       timeout: 10000,                            // optional
-      url: config.mongoURL
+      url: config.mongoURL,
+      options: {
+        ssl: config.mongoURL.indexOf('ssl=true')>0,
+        autoReconnect: true
+      }
     });
     this.streamId = 'transactions';
 
 
     this.es.on('connect', () => {
-      this.logger.info('storage connected');
+      this.logger.info('Eventstore storage connected');
     });
 
-    this.logger.debug('DEBUG');
-    this.es.on('disconnect', () =>  {
-      this.logger.error('connection to storage is gone');
+    this.es.on('disconnect', () => {
+      this.logger.error('Eventstore storage disconnected');
     });
 
     this.es.defineEventMappings({
@@ -42,7 +44,13 @@ export default class TransactionService {
       bus.emit(event.type, event);
     });
 
-    this.es.init();
+    this.es.init(err => {
+      if (err) {
+        this.logger.error(err, 'Error initializing eventstore');
+        return;
+      }
+      this.logger.info('Eventstore initialized');
+    });
   }
 
   handleError = (e: Error) => {
