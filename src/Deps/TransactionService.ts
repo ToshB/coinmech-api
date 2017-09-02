@@ -13,6 +13,7 @@ export default class TransactionService {
 
   constructor(readonly config: Config, bus: EventEmitter2, logger: Logger) {
     this.logger = logger.child({});
+    this.logger.info('Initializing TransactionService');
     this.es = createEventStore({
       type: 'mongodb',
       eventsCollectionName: 'transactions',             // optional
@@ -21,6 +22,7 @@ export default class TransactionService {
       url: config.mongoURL
     });
     this.streamId = 'transactions';
+
 
     this.es.on('connect', () => {
       this.logger.info('storage connected');
