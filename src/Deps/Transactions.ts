@@ -2,13 +2,14 @@ import {ObjectID} from 'bson';
 import pino = require('pino');
 import {Player} from './PlayerRepository';
 import {Machine} from './MachineRepository';
-import * as assert from 'assert';
+import {Card} from './CardRepository';
 
 const logger = pino({name: 'transactions'});
 
 export enum TransactionType {
+  RegisterCard = "Register Card",
   BuyCredit = "Buy Credit",
-  LoadMoney = "Load Money",
+  LoadMoney = "Load Money"
 }
 
 export enum TransactionMethod {
@@ -32,42 +33,49 @@ function assertPositive(amount: number) {
   }
 }
 
-function assertValid(obj: object, msg: string) {
+function assertValid(obj: any, msg: string) {
   if (!obj) {
     logger.error(msg);
     throw new Error(msg);
   }
 }
 
-export abstract class TransactionEvent {
+export abstract class CardEvent {
   cardId: string;
   type: TransactionType;
-  player: { id: ObjectID, name: string };
+
+  constructor(type: TransactionType, cardId: string) {
+    assertValid(cardId, 'valid card is required');
+    this.cardId = cardId;
+    this.type = type;
+  }
+}
+export class RegisterCardEvent extends CardEvent {
+  constructor(cardId: string) {
+    super(TransactionType.RegisterCard, cardId);
+  }
+}
+
+export abstract class TransactionEvent extends CardEvent {
+  player?: { id: ObjectID, name: string };
   amount: number;
 
-  constructor(cardId: string, player: Player, amount: number) {
-    if (!cardId) {
-      throw new Error('cardId is required');
-    }
+  constructor(type: TransactionType, card: Card, player: Player, amount: number) {
+    assertValid(card, 'valid card is required');
+    super(type, card.cardId);
 
-    assertValid(player, 'valid player is required');
-
-    this.cardId = cardId;
-    this.player = {
+    this.player = player ? {
       id: player._id,
       name: player.name
-    };
+    } : null;
     this.amount = amount;
   }
 }
 
 export class LoadMoneyEvent extends TransactionEvent {
-  constructor(cardId: string, player: Player, amount: number) {
-    logger.info({cardId, player, amount}, 'Load Money');
+  constructor(card: Card, player: Player, amount: number) {
     assertPositive(amount);
-
-    super(cardId, player, amount);
-    this.type = TransactionType.LoadMoney;
+    super(TransactionType.LoadMoney, card, player, amount);
   }
 }
 
@@ -75,15 +83,12 @@ export class LoadMoneyEvent extends TransactionEvent {
 export class BuyCreditEvent extends TransactionEvent {
   machine: { id: ObjectID, name: string; };
 
-  constructor(cardId: string, player: Player, machine: Machine) {
-    logger.info({cardId, player, machine}, 'Buy Credit');
+  constructor(card: Card, player: Player, machine: Machine) {
     assertValid(machine, 'valid machine is required');
-
-    super(cardId, player, -machine.price);
+    super(TransactionType.BuyCredit, card, player, -machine.price);
     this.machine = {
       id: machine._id,
       name: machine.name
     };
-    this.type = TransactionType.BuyCredit;
   }
 }

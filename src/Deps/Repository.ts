@@ -50,9 +50,6 @@ export abstract class Repository<T extends RepositoryModel> {
   get(id: string): Promise<T> {
     return Promise.resolve()
       .then(() => {
-        if(!ObjectID.isValid(id)){
-          throw new Error(`Invalid object id: ${id}`)
-        }
         return this.collection.find({_id: new ObjectID(id)}).toArray();
       })
       .then(res => {

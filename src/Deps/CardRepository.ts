@@ -5,21 +5,32 @@ import {Repository, RepositoryModel} from './Repository';
 
 declare module 'mongodb' {
   interface Collection {
-    findAndModify<T>(a: any, b: any, c: any, d: any): Promise<{value: T}>;
+    findAndModify<T>(a: any, b: any, c: any, d: any): Promise<{ value: T }>;
   }
 }
 
-export interface Card extends RepositoryModel{
+export interface Card extends RepositoryModel {
   cardId: string;
   lastSeen: Date;
   balance: number;
-  playerId: string;
+  playerId?: string;
 }
 
 export default class CardRepository extends Repository<Card> {
   constructor(db: Db, logger: Logger) {
     super('cards', db, logger);
     this.collection.createIndex({cardId: 1}, {unique: true});
+  }
+
+  getByCardId(cardId: string): Promise<Card | undefined> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection.find({cardId}).toArray();
+      })
+      .then(res => {
+        return res[0];
+      })
+      .catch(this.handleError);
   }
 
   addOrUpdate(cardId: string): Promise<Card> {
@@ -47,6 +58,20 @@ export default class CardRepository extends Repository<Card> {
           .findOneAndUpdate(
             {_id: new ObjectID(id)},
             {$set: {playerId: playerId}},
+            {returnOriginal: false}
+          );
+      })
+      .then(({value}) => value)
+      .catch(this.handleError);
+  }
+
+  updateBalance(cardId: string, amount: number): Promise<Card> {
+    return Promise.resolve()
+      .then(() => {
+        return this.collection
+          .findOneAndUpdate(
+            {cardId},
+            {$inc: {balance: amount}},
             {returnOriginal: false}
           );
       })

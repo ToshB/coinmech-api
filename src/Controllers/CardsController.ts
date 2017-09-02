@@ -1,12 +1,14 @@
 import Deps from '../Deps';
 import {Router, Request, Response} from 'express';
 import CardRepository, {Card} from '../Deps/CardRepository';
-import PlayerRepository from '../Deps/PlayerRepository';
+import PlayerRepository, {Player} from '../Deps/PlayerRepository';
 import MachineRepository from '../Deps/MachineRepository';
 import TransactionService from '../Deps/TransactionService';
-import {BuyCreditEvent, LoadMoneyEvent} from '../Deps/Transactions';
+import pino = require('pino');
+import {BuyCreditEvent, LoadMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
 
 export default class CardsController {
+  private logger: pino.Logger;
   public router: Router;
   private cardRepository: CardRepository;
   private playerRepository: PlayerRepository;
@@ -15,6 +17,7 @@ export default class CardsController {
 
   constructor(deps: Deps) {
     this.router = Router();
+    this.logger = deps.logger.child({name: 'CardsController'});
     this.cardRepository = deps.cardRepository;
     this.playerRepository = deps.playerRepository;
     this.transactionService = deps.transactionService;
@@ -29,23 +32,47 @@ export default class CardsController {
 
   scanCard(req: Request, res: Response) {
     const cardId = req.body.data;
-    this.cardRepository.addOrUpdate(cardId)
-      .then((card: Card) => {
-        if (card.playerId) {
-          this.playerRepository.get(card.playerId)
-            .then(player => res.send({card, player}));
-        } else {
-          res.send({card, player: null})
+    //const machineId = null;
+    this.cardRepository.getByCardId(cardId)
+      .then(card => {
+        if (!card) {
+          return this.transactionService.addTransaction(new RegisterCardEvent(cardId))
+            .then(() => ({cardId, balance: 0} as Card));
         }
+
+        return card;
       })
-      .catch((e: Error) => res.status(500).send(e.message));
+      .then(card => Promise.all([
+        card,
+        this.playerRepository.get(card.playerId),
+        this.machineRepository.getAll()
+      ]))
+      .then(([card, player, machines]) => {
+          const randomMachine = machines[0];
+          if (randomMachine) {
+            return this.transactionService.addTransaction(new BuyCreditEvent(card, player, randomMachine))
+              .then(() => ([card, player]));
+          } else {
+            this.logger.warn('No machine associated with scanned card');
+            return [card, player];
+          }
+        }
+      )
+      .then(([card, player]) => {
+        res.send({card, player: player || null})
+      })
+      .catch(e => {
+        console.error(e);
+        throw e;
+      })
+      .catch((e: Error) => res.status(500).send({error: e.message}));
 
   }
 
   getCards(_req: Request, res: Response) {
     this.cardRepository.getAll()
       .then(cards => res.send({cards}))
-      .catch(e => res.status(500).send(e.message));
+      .catch(e => res.status(500).send({error: e.message}));
   }
 
   assignCard(req: Request, res: Response) {
@@ -57,11 +84,17 @@ export default class CardsController {
 
   loadMoney(req: Request, res: Response) {
     const cardId = req.params.id;
-    const playerId = req.body.playerId;
     const amount = req.body.amount;
 
-    Promise.resolve()
-      .then(() => new LoadMoneyEvent(cardId, playerId, amount))
+    this.cardRepository.getByCardId(cardId)
+      .then(card => {
+        if (!card) {
+          throw new Error(`Card with id ${cardId} not found`)
+        }
+
+        return this.playerRepository.get(card.playerId)
+          .then(player => new LoadMoneyEvent(card, player, amount));
+      })
       .then(transaction => this.transactionService.addTransaction(transaction))
       .then(events => res.send(events))
       .catch(err => res.status(400).send({error: err.message}));
@@ -69,15 +102,23 @@ export default class CardsController {
 
   buyCredit(req: Request, res: Response) {
     const cardId = req.params.id;
-    const playerId = req.body.playerId;
     const machineId = req.body.machineId;
 
-    Promise.all([
-      this.playerRepository.get(playerId),
+    return Promise.all([
+      this.cardRepository.getByCardId(cardId),
       this.machineRepository.get(machineId)
     ])
-      .then(([player, machine]) => {
-        return new BuyCreditEvent(cardId, player, machine)
+      .then(([card, machine]) => {
+        if (!card) {
+          throw new Error(`Card with id ${cardId} not found`);
+        }
+
+        if (!machine) {
+          throw new Error(`Machine with id ${machineId} not found`);
+        }
+
+        return this.playerRepository.get(card.playerId)
+          .then(player => new BuyCreditEvent(card, player, machine));
       })
       .then(transaction => this.transactionService.addTransaction(transaction))
       .then(events => res.send(events))

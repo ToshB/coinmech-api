@@ -4,7 +4,8 @@ import TransactionService from '../Deps/TransactionService';
 import PlayerRepository, {Player} from '../Deps/PlayerRepository';
 import MachineRepository, {Machine} from '../Deps/MachineRepository';
 import CardRepository, {Card} from '../Deps/CardRepository';
-import {BuyCreditEvent, LoadMoneyEvent} from '../Deps/Transactions';
+import {BuyCreditEvent, LoadMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
+import {Collection, Db} from 'mongodb';
 
 const r5 = () => Math.floor(5 * Math.random());
 
@@ -26,9 +27,11 @@ export default class DummyDataController {
   public router: Router;
   private transactionService: TransactionService;
   private cardRepository: CardRepository;
+  private collection: Collection;
 
   constructor(deps: Deps) {
     this.router = Router();
+    this.collection = deps.db.collection('transactions');
     this.playerRepository = deps.playerRepository;
     this.machineRepository = deps.machineRepository;
     this.cardRepository = deps.cardRepository;
@@ -54,30 +57,23 @@ export default class DummyDataController {
       ])
     ])
       .then(([players, machines]) => {
-        const cardPromises = players.map(player => this.cardRepository.add({
-          cardId: cardId(),
-          lastSeen: new Date(),
-          balance: 0,
-          playerId: player._id.toString()
-        }).then((card: Card) => ({player, card})));
-
-        return Promise.all([
-          machines,
-          Promise.all(cardPromises)
-        ]);
-      })
-      .then(([machines, playerCardPairs]) => ({playerCardPairs, machines}));
+        const playerCardPairs = players.map(player => ({player, card: {cardId: cardId()} as Card}));
+        return {playerCardPairs, machines};
+      });
   }
 
   generateTransactions(playerCardPairs: PlayerCardPair[], machines: Machine[]) {
-    return Promise.all([playerCardPairs.map(({player, card}) => {
-      this.transactionService.addTransaction(new LoadMoneyEvent(card.cardId, player, 200));
-    })])
+    return Promise.all(playerCardPairs.map(({player, card}) => {
+      return this.transactionService.addTransaction(new RegisterCardEvent(card.cardId));
+    }))
+      .then(() => Promise.all(playerCardPairs.map(({player, card}) => {
+        return this.transactionService.addTransaction(new LoadMoneyEvent(card, player, 200));
+      })))
       .then(() => {
         for (let i = 0; i < 20; i++) {
           const {card, player} = playerCardPairs[r5()];
           const machine = machines[r5()];
-          this.transactionService.addTransaction(new BuyCreditEvent(card.cardId, player, machine));
+          this.transactionService.addTransaction(new BuyCreditEvent(card, player, machine));
         }
       });
   }

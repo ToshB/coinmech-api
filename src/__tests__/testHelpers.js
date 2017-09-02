@@ -1,6 +1,7 @@
 import Config from '../Config';
 import Server from '../Server';
 import Deps from '../Deps';
+import * as referee from 'referee';
 
 const MongoInMemory = require('mongo-in-memory');
 const mongodb = require('mongodb');
@@ -11,6 +12,8 @@ export const verify = (done) => (err) => {
   return err ? done.fail(err) : done();
 };
 
+
+export const assert = referee.assert;
 export const check = func => (res, body, next) => {
   let err;
   try {
@@ -56,6 +59,7 @@ export function createTestServer() {
         jwtHmacSecret: 'secret'
       });
       const deps = new Deps(config, db);
+      deps.logger.level = 'fatal';
       const server = new Server(deps);
       return {
         express: server.express,

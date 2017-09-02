@@ -469,6 +469,10 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
 
+bane@1.x:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/bane/-/bane-1.1.2.tgz#bc64248cc823160c7df3f238b87fe62c44e107b9"
+
 base64url@2.0.0, base64url@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/base64url/-/base64url-2.0.0.tgz#eac16e03ea1438eff9423d69baa36262ed1f70bb"
@@ -1220,6 +1224,10 @@ event-stream@~3.3.0:
     split "0.3"
     stream-combiner "~0.0.4"
     through "~2.3.1"
+
+eventemitter2@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/eventemitter2/-/eventemitter2-4.1.2.tgz#0e1a8477af821a6ef3995b311bf74c23a5247f15"
 
 eventstore@^1.12.3:
   version "1.12.3"
@@ -2694,6 +2702,10 @@ lodash.restparam@^3.0.0:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
 
+lodash@3.x:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
+
 lodash@4.17.4, lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.5.1:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
@@ -3492,6 +3504,14 @@ readdirp@^2.0.0:
     minimatch "^3.0.2"
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
+
+referee@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/referee/-/referee-1.2.0.tgz#7a779bee5955c78aff7d88c0161c5a1f45458c90"
+  dependencies:
+    bane "1.x"
+    lodash "3.x"
+    samsam "1.x"
 
 regenerator-runtime@^0.10.0:
   version "0.10.5"
