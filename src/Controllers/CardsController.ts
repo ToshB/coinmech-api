@@ -6,6 +6,7 @@ import MachineRepository from '../Deps/MachineRepository';
 import TransactionService from '../Deps/TransactionService';
 import pino = require('pino');
 import {BuyCreditEvent, LoadMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
+import {logAndSend} from '../ErrorHandler';
 
 export default class CardsController {
   private logger: pino.Logger;
@@ -65,21 +66,21 @@ export default class CardsController {
         console.error(e);
         throw e;
       })
-      .catch((e: Error) => res.status(500).send({error: e.message}));
-
+      .catch(logAndSend(this.logger, res));
   }
 
   getCards(_req: Request, res: Response) {
     this.cardRepository.getAll()
       .then(cards => res.send({cards}))
-      .catch(e => res.status(500).send({error: e.message}));
+      .catch(logAndSend(this.logger, res));
   }
 
   assignCard(req: Request, res: Response) {
     const cardId = req.params.id;
     const playerId = req.body.playerId.length ? req.body.playerId : null;
     this.cardRepository.assignToPlayer(cardId, playerId)
-      .then(card => res.send(card));
+      .then(card => res.send(card))
+      .catch(logAndSend(this.logger, res));
   }
 
   loadMoney(req: Request, res: Response) {
@@ -97,7 +98,7 @@ export default class CardsController {
       })
       .then(transaction => this.transactionService.addTransaction(transaction))
       .then(events => res.send(events))
-      .catch(err => res.status(400).send({error: err.message}));
+      .catch(logAndSend(this.logger, res));
   }
 
   buyCredit(req: Request, res: Response) {
@@ -122,6 +123,6 @@ export default class CardsController {
       })
       .then(transaction => this.transactionService.addTransaction(transaction))
       .then(events => res.send(events))
-      .catch(err => res.status(400).send({error: err.message}));
+      .catch(logAndSend(this.logger, res));
   }
 };

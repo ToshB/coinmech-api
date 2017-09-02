@@ -7,11 +7,6 @@ import MachinesController from './Controllers/MachinesController';
 import LoginController from './Controllers/LoginController';
 import TransactionsController from './Controllers/TransactionsController';
 import DummyDataController from './Controllers/DummyDataController';
-// import CreditsController from './Controllers/CreditsController';
-// import DeviceController from './Controllers/DeviceController';
-
-
-
 
 export default class ApiRouter {
   public router: Router;
@@ -27,11 +22,6 @@ export default class ApiRouter {
     this.router.use('/transactions', new TransactionsController(deps).router);
 
     this.router.use('/generate', new DummyDataController(deps).router);
-    // this.router.use('/credits', new CreditsController(deps).router);
-
-    // this.router.use('/device', new DeviceController(deps).router);
-
-
 
     this.router.get('/', (_req: any, res: Response) => {
       res.send({description: 'coinmech api'})
