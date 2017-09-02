@@ -1,5 +1,5 @@
 import Deps from "./Deps";
-import {EventEmitter2} from 'EventEmitter2';
+import {EventEmitter2} from 'eventemitter2';
 import {BuyCreditEvent, RegisterCardEvent, TransactionEvent, TransactionType} from './Deps/Transactions';
 import pino = require('pino');
 import CardRepository, {Card} from './Deps/CardRepository';

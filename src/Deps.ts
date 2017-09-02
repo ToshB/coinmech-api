@@ -1,5 +1,5 @@
 // import {Pool} from 'pg';
-import {EventEmitter2} from 'EventEmitter2';
+import {EventEmitter2} from 'eventemitter2';
 import PlayerRepository from './Deps/PlayerRepository';
 import CardRepository from './Deps/CardRepository';
 import MachineRepository from './Deps/MachineRepository';

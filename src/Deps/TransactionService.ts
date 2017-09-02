@@ -2,7 +2,7 @@ import {Logger} from 'pino';
 import {createEventStore, EsEvent, EventStore, EventStream} from './EventStore';
 import Config from '../Config';
 import {CardEvent, TransactionEvent} from './Transactions';
-import {EventEmitter2} from 'EventEmitter2';
+import {EventEmitter2} from 'eventemitter2';
 import pino = require('pino');
 
 export default class TransactionService {
