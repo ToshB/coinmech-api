@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "env $(cat .env) nodemon | pino",
+    "start-dist": "node dist/index.js | pino-syslog",
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "jest"
@@ -26,7 +27,8 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "mongodb": "^2.2.31",
-    "pino": "^4.7.1"
+    "pino": "^4.7.1",
+    "pino-syslog": "^1.1.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.16.4",
