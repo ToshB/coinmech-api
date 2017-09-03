@@ -13,7 +13,6 @@ export interface Card extends RepositoryModel {
   cardId: string;
   lastSeen: Date;
   balance: number;
-  playerId?: string;
 }
 
 export default class CardRepository extends Repository<Card> {
@@ -40,28 +39,14 @@ export default class CardRepository extends Repository<Card> {
         [],
         {
           $set: {cardId: cardId, lastSeen: new Date()},
-          $setOnInsert: {balance: 0, playerId: null}
+          $setOnInsert: {balance: 0}
         },
         {
-          new: true,
+          'new': true,
           upsert: true
         }
       )
       .then(res => res.value)
-      .catch(this.handleError);
-  }
-
-  assignToPlayer(id: string, playerId?: string): Promise<Card> {
-    return Promise.resolve()
-      .then(() => {
-        return this.collection
-          .findOneAndUpdate(
-            {_id: new ObjectID(id)},
-            {$set: {playerId: playerId}},
-            {returnOriginal: false}
-          );
-      })
-      .then(({value}) => value)
       .catch(this.handleError);
   }
 
@@ -77,5 +62,9 @@ export default class CardRepository extends Repository<Card> {
       })
       .then(({value}) => value)
       .catch(this.handleError);
+  }
+
+  deleteAll() {
+    return this.collection.deleteMany({});
   }
 }

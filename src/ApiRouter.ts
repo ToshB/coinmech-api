@@ -6,6 +6,7 @@ import CardsController from './Controllers/CardsController';
 import MachinesController from './Controllers/MachinesController';
 import LoginController from './Controllers/LoginController';
 import TransactionsController from './Controllers/TransactionsController';
+import DevicesController from './Controllers/DevicesController';
 import DummyDataController from './Controllers/DummyDataController';
 
 export default class ApiRouter {
@@ -20,6 +21,7 @@ export default class ApiRouter {
     this.router.use('/machines', new MachinesController(deps).router);
     this.router.use('/login', new LoginController(deps).router);
     this.router.use('/transactions', new TransactionsController(deps).router);
+    this.router.use('/devices', new DevicesController(deps).router);
 
     this.router.use('/generate', new DummyDataController(deps).router);
 

@@ -19,7 +19,7 @@ export abstract class Repository<T extends RepositoryModel> {
     throw new Error(`Error querying DB: ${e.message}`);
   };
 
-  add(item: T) {
+  add(item: T): Promise<T> {
     return this.collection
       .insertOne(item)
       .then(({ops}) => ops[0] as T)

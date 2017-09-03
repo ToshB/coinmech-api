@@ -10,9 +10,11 @@ export default class TransactionService {
   public initialized: boolean;
   private streamId: string;
   private logger: pino.Logger;
+  private bus: EventEmitter2;
 
   constructor(readonly config: Config, bus: EventEmitter2, logger: Logger) {
     this.logger = logger.child({});
+    this.bus = bus;
     this.es = createEventStore({
       type: 'mongodb',
       eventsCollectionName: 'transactions',             // optional
@@ -20,7 +22,7 @@ export default class TransactionService {
       timeout: 10000,                            // optional
       url: config.mongoURL,
       options: {
-        ssl: config.mongoURL.indexOf('ssl=true')>0,
+        ssl: config.mongoURL.indexOf('ssl=true') > 0,
         autoReconnect: true
       }
     });
@@ -93,7 +95,8 @@ export default class TransactionService {
   replayAllEvents() {
     return new Promise(resolve => {
       this.es.getEventStream(this.streamId, (err: Error, stream: EventStream<CardEvent>) => {
-
+        stream.events.forEach(event => this.bus.emit(event.payload.type, event.payload));
+        resolve(stream.events.length);
       });
     });
   }

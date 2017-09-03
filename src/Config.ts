@@ -15,6 +15,7 @@ export default class Config {
   adminPassword: string;
   adminUsername: string;
   jwtHmacSecret: string;
+  particleAccessToken: string;
   mongoURL: string;
   port: string;
   google?: {
@@ -29,6 +30,7 @@ export default class Config {
     this.adminUsername = config.adminUsername;
     this.adminPassword = config.adminPassword;
     this.jwtHmacSecret = config.jwtHmacSecret;
+    this.particleAccessToken = config.particleAccessToken;
   }
 
   static fromEnv() {
@@ -41,7 +43,8 @@ export default class Config {
       mongoURL: readRequiredEnv('MONGO_URL'),
       adminPassword: readRequiredEnv('ADMIN_PASSWORD'),
       adminUsername: readRequiredEnv('ADMIN_USERNAME'),
-      jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET')
+      jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET'),
+      particleAccessToken: readRequiredEnv('PARTICLE_ACCESS_TOKEN')
     });
   }
 }
