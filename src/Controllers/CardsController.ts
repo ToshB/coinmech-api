@@ -33,9 +33,15 @@ export default class CardsController {
 
   scanCard(req: Request, res: Response) {
     const cardId = req.body.data;
+    this.logger.info(req.headers);
     const deviceId = req.header('x-deviceid');
-
-    this.cardRepository.getByCardId(cardId)
+    Promise.resolve(cardId)
+      .then(cardId => {
+        if (!cardId) {
+          throw new Error('Missing required cardId');
+        }
+        return this.cardRepository.getByCardId(cardId);
+      })
       .then(card => {
         if (!card) {
           return this.transactionService.addTransaction(new RegisterCardEvent(cardId))
@@ -49,18 +55,22 @@ export default class CardsController {
         this.playerRepository.getByCardId(cardId),
         this.machineRepository.getByDeviceId(deviceId)
       ]))
-      .then(([card, player, machine]) => {
+      .then(([card, player = null, machine]) => {
           if (machine) {
-            return this.transactionService.addTransaction(new BuyCreditEvent(card, player, machine))
-              .then(() => ([card, player, machine]));
+            if (card.balance >= machine.price) {
+              return this.transactionService.addTransaction(new BuyCreditEvent(card, player, machine))
+                .then(() => ({card, player, machine, success: true}));
+            } else {
+              return {card, player, machine, success: false};
+            }
           } else {
             this.logger.warn(`No machine associated with device ${deviceId}`);
-            return [card, player, null];
+            return {card, player, machine: null, success: false};
           }
         }
       )
-      .then(([card, player, machine]) => {
-        res.send({card, player: player || null, machine: machine || null})
+      .then((result) => {
+        res.send(result);
       })
       .catch(e => {
         console.error(e);
