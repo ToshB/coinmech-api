@@ -16,7 +16,7 @@ export default class EventHandler {
     this.bus.onAny(this.eventLogger);
     this.bus.on(TransactionType.RegisterCard, this.registerCard);
     this.bus.on(TransactionType.BuyCredit, this.updateCardBalance);
-    this.bus.on(TransactionType.LoadMoney, this.updateCardBalance);
+    this.bus.on(TransactionType.AddMoney, this.updateCardBalance);
   }
 
   eventLogger = (type: string, event: TransactionEvent) => {

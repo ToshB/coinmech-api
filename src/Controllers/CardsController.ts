@@ -5,7 +5,7 @@ import PlayerRepository, {Player} from '../Deps/PlayerRepository';
 import MachineRepository from '../Deps/MachineRepository';
 import TransactionService from '../Deps/TransactionService';
 import pino = require('pino');
-import {BuyCreditEvent, LoadMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
+import {BuyCreditEvent, AddMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
 import {logAndSend} from '../ErrorHandler';
 
 export default class CardsController {
@@ -26,8 +26,9 @@ export default class CardsController {
 
     this.router.get('/', this.getCards.bind(this));
     this.router.post('/', this.scanCard.bind(this));
+    this.router.get('/:id', this.getCard.bind(this));
     this.router.post('/:id/assignToPlayer', this.assignCard.bind(this));
-    this.router.post('/:id/loadMoney', this.loadMoney.bind(this));
+    this.router.post('/:id/addMoney', this.addMoney.bind(this));
     // this.router.post('/:id/buyCredit', this.buyCredit.bind(this));
   }
 
@@ -79,6 +80,13 @@ export default class CardsController {
       .catch(logAndSend(this.logger, res));
   }
 
+  getCard(req: Request, res: Response) {
+    const cardId = req.params.id;
+    this.cardRepository.getByCardId(cardId)
+      .then(card => res.send(card))
+      .catch(logAndSend(this.logger, res));
+  }
+
   getCards(_req: Request, res: Response) {
     this.cardRepository.getAll()
       .then(cards => res.send({cards}))
@@ -100,7 +108,7 @@ export default class CardsController {
       .catch(logAndSend(this.logger, res));
   }
 
-  loadMoney(req: Request, res: Response) {
+  addMoney(req: Request, res: Response) {
     const cardId = req.params.id;
     const amount = req.body.amount;
 
@@ -111,10 +119,11 @@ export default class CardsController {
         }
 
         return this.playerRepository.getByCardId(cardId)
-          .then(player => new LoadMoneyEvent(card, player, amount));
+          .then(player => new AddMoneyEvent(card, player, amount));
       })
       .then(transaction => this.transactionService.addTransaction(transaction))
-      .then(events => res.send(events))
+      .then(() => this.cardRepository.getByCardId(cardId))
+      .then(card => res.send(card))
       .catch(logAndSend(this.logger, res));
   }
 

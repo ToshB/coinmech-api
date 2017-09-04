@@ -9,7 +9,7 @@ const logger = pino({name: 'transactions'});
 export enum TransactionType {
   RegisterCard = "Register Card",
   BuyCredit = "Buy Credit",
-  LoadMoney = "Load Money"
+  AddMoney = "Load Money"
 }
 
 export enum TransactionMethod {
@@ -72,10 +72,10 @@ export abstract class TransactionEvent extends CardEvent {
   }
 }
 
-export class LoadMoneyEvent extends TransactionEvent {
+export class AddMoneyEvent extends TransactionEvent {
   constructor(card: Card, player: Player, amount: number) {
     assertPositive(amount);
-    super(TransactionType.LoadMoney, card, player, amount);
+    super(TransactionType.AddMoney, card, player, amount);
   }
 }
 

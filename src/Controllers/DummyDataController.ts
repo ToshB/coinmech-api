@@ -4,7 +4,7 @@ import TransactionService from '../Deps/TransactionService';
 import PlayerRepository, {Player} from '../Deps/PlayerRepository';
 import MachineRepository, {Machine} from '../Deps/MachineRepository';
 import CardRepository, {Card} from '../Deps/CardRepository';
-import {BuyCreditEvent, LoadMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
+import {BuyCreditEvent, AddMoneyEvent, RegisterCardEvent} from '../Deps/Transactions';
 import {Collection} from 'mongodb';
 
 const r5 = () => Math.floor(5 * Math.random());
@@ -64,7 +64,7 @@ export default class DummyDataController {
     }))
       .then(() => Promise.all(players.map(player => {
         const card = {cardId: player.cardId} as Card;
-        return this.transactionService.addTransaction(new LoadMoneyEvent(card, player, 200));
+        return this.transactionService.addTransaction(new AddMoneyEvent(card, player, 200));
       })))
       .then(() => {
         for (let i = 0; i < 20; i++) {

@@ -24,10 +24,7 @@ export default class CardRepository extends Repository<Card> {
   getByCardId(cardId: string): Promise<Card | undefined> {
     return Promise.resolve()
       .then(() => {
-        return this.collection.find({cardId}).toArray();
-      })
-      .then(res => {
-        return res[0];
+        return this.collection.findOne({cardId});
       })
       .catch(this.handleError);
   }
