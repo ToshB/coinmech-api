@@ -34,8 +34,7 @@ export default class CardsController {
 
   scanCard(req: Request, res: Response) {
     const cardId = req.body.data;
-    this.logger.info(req.headers);
-    const deviceId = req.header('x-deviceid');
+    const deviceId = req.body.coreId;
     Promise.resolve(cardId)
       .then(cardId => {
         if (!cardId) {
@@ -60,8 +59,10 @@ export default class CardsController {
           if (machine) {
             if (card.balance >= machine.price) {
               return this.transactionService.addTransaction(new BuyCreditEvent(card, player, machine))
-                .then(() => ({card, player, machine, success: true}));
+                .then(() => this.cardRepository.getByCardId(cardId))
+                .then(card => ({card, player, machine, success: true}));
             } else {
+              this.logger.info(`Insufficient funds on card ${cardId} to pay for ${machine.name} (Price: ${machine.price})`);
               return {card, player, machine, success: false};
             }
           } else {
