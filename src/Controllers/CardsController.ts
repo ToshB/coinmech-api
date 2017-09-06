@@ -34,7 +34,8 @@ export default class CardsController {
 
   scanCard(req: Request, res: Response) {
     const cardId = req.body.data;
-    const deviceId = req.body.coreId;
+    const deviceId = req.body.coreid;
+    this.logger.info(`Card ${cardId} scanned (DeviceId: ${deviceId}`);
     Promise.resolve(cardId)
       .then(cardId => {
         if (!cardId) {
