@@ -1,5 +1,5 @@
-import Deps from "./Deps";
-import {Router, Response} from "express";
+import Deps from './Deps';
+import {Router, Request, Response, NextFunction} from 'express';
 import * as cors from 'cors';
 import PlayersController from './Controllers/PlayersController';
 import CardsController from './Controllers/CardsController';
@@ -8,6 +8,16 @@ import LoginController from './Controllers/LoginController';
 import TransactionsController from './Controllers/TransactionsController';
 import DevicesController from './Controllers/DevicesController';
 import DummyDataController from './Controllers/DummyDataController';
+import AuthController from './Controllers/AuthController';
+
+const requireUser = (req: Request, res: Response, next: NextFunction) => {
+  // if (req.isAuthenticated()) {
+  //   console.log(req.user);
+    return next();
+  // }
+
+  // return res.redirect('/login');
+};
 
 export default class ApiRouter {
   public router: Router;
@@ -16,7 +26,9 @@ export default class ApiRouter {
     this.router = Router();
     this.router.use(cors());
 
-    this.router.use('/players', new PlayersController(deps).router);
+    this.router.use('/auth', new AuthController(deps).router);
+
+    this.router.use('/players', requireUser, new PlayersController(deps).router);
     this.router.use('/cards', new CardsController(deps).router);
     this.router.use('/machines', new MachinesController(deps).router);
     this.router.use('/login', new LoginController(deps).router);

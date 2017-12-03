@@ -37,7 +37,7 @@ export default class Config {
     return new Config({
       port: readEnv('PORT') || '4000',
       google: {
-        clientId: readEnv('GOOGLE_CLIENTID'),
+        clientId: readRequiredEnv('GOOGLE_CLIENTID'),
         clientSecret: readEnv('GOOGLE_CLIENTSECRET')
       },
       mongoURL: readRequiredEnv('MONGO_URL'),

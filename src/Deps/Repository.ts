@@ -8,7 +8,7 @@ export interface RepositoryModel {
 }
 
 export abstract class Repository<T extends RepositoryModel> {
-  protected collection: Collection;
+  protected collection: Collection<T>;
 
   constructor(collectionName: string, db: Db, readonly logger: Logger) {
     this.collection = db.collection(collectionName);
