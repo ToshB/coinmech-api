@@ -9,7 +9,7 @@ declare module 'mongodb' {
 }
 
 export interface Player extends RepositoryModel {
-  googleId: string;
+  googleId?: string;
   name: string;
   email: string;
   cardId: string;
