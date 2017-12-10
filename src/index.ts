@@ -1,11 +1,11 @@
 import Config from './Config';
 import Server from './Server';
 import Deps from './Deps';
-import {Db, MongoClient} from 'mongodb';
+import 'reflect-metadata';
 
 const config = Config.fromEnv();
-MongoClient.connect(config.mongoURL)
-  .then((db: Db) => {
-    const deps = new Deps(config, db);
+const deps = new Deps(config);
+deps.initialize()
+  .then(deps => {
     new Server(deps).start()
   });

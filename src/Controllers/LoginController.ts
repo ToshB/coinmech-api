@@ -19,6 +19,10 @@ export default class LoginController {
     this.jwtSecret = deps.config.jwtHmacSecret;
   }
 
+  createUser(req: Request, res: Response) {
+
+  }
+
   login(req: Request, res: Response) {
     const {username, password} = req.body;
     if (username === this.adminUsername && password === this.adminPassword) {

@@ -22,6 +22,8 @@ export default class Config {
     clientId?: string;
     clientSecret?: string;
   };
+  postgresURL: string;
+
 
   constructor(config: Config) {
     this.mongoURL = config.mongoURL;
@@ -31,6 +33,7 @@ export default class Config {
     this.adminPassword = config.adminPassword;
     this.jwtHmacSecret = config.jwtHmacSecret;
     this.particleAccessToken = config.particleAccessToken;
+    this.postgresURL = config.postgresURL;
   }
 
   static fromEnv() {
@@ -44,7 +47,8 @@ export default class Config {
       adminPassword: readRequiredEnv('ADMIN_PASSWORD'),
       adminUsername: readRequiredEnv('ADMIN_USERNAME'),
       jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET'),
-      particleAccessToken: readRequiredEnv('PARTICLE_ACCESS_TOKEN')
+      particleAccessToken: readRequiredEnv('PARTICLE_ACCESS_TOKEN'),
+      postgresURL: readRequiredEnv('POSTGRES_URL')
     });
   }
 }
