@@ -48,7 +48,7 @@ export default class Config {
       adminUsername: readRequiredEnv('ADMIN_USERNAME'),
       jwtHmacSecret: readRequiredEnv('JWT_HMAC_SECRET'),
       particleAccessToken: readRequiredEnv('PARTICLE_ACCESS_TOKEN'),
-      postgresURL: readRequiredEnv('POSTGRES_URL')
+      postgresURL: readRequiredEnv('DATABASE_URL')
     });
   }
 }
