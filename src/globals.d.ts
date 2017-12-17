@@ -1,8 +1,10 @@
-import {User} from './entity/User';
-
+import {Request} from 'express';
+export {Request};
 declare module 'express' {
   interface Request {
-    user?: User;
+    user?: {
+      email: string;
+    };
     isAuthenticated: boolean;
   }
 }

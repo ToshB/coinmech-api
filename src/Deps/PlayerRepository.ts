@@ -38,7 +38,7 @@ export default class PlayerRepository extends Repository<Player> {
           upsert: true
         }
       )
-      .then(res => res.value)
+      .then((res: {value: Player}) => res.value)
       .catch(this.handleError);
   }
 

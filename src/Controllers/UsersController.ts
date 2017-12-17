@@ -25,6 +25,7 @@ export default class UsersController {
     this.requireUserMiddleware = this.requireUserMiddleware.bind(this);
     this.router.post('/', this.registerUser.bind(this));
     this.router.post('/login', this.login.bind(this));
+    this.router.get('/info', this.info.bind(this));
   }
 
   private createUser(email: string, password: string) {
@@ -36,6 +37,11 @@ export default class UsersController {
       });
   }
 
+  private trimUser(user: User) {
+    return {
+      email: user.email
+    };
+  }
   authorizeMiddleware(req: Request, res: Response, next: NextFunction) {
     req.isAuthenticated = false;
     const authorizationHeader = req.get('authorization');
@@ -50,7 +56,7 @@ export default class UsersController {
 
     return this.verifyToken(matches[1])
       .then(user => {
-        req.user = user;
+        req.user = this.trimUser(user);
         req.isAuthenticated = true;
         return next();
       })
@@ -118,11 +124,19 @@ export default class UsersController {
       })
       .then(user => {
         const token = this.generateToken(user);
-        res.send({token});
+        res.send({user: this.trimUser(user), token});
       })
       .catch(err => {
         console.error(err);
-        return res.send('Incorrect username or password');
+        return res.status(403).send({error: 'Incorrect username or password'});
       })
+  }
+
+  info(req: Request, res: Response) {
+    if(!req.isAuthenticated){
+      return res.status(403).send();
+    }
+
+    return res.send(req.user);
   }
 };

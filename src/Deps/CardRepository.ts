@@ -43,7 +43,7 @@ export default class CardRepository extends Repository<Card> {
           upsert: true
         }
       )
-      .then(res => res.value)
+      .then((res: {value: Card}) => res.value)
       .catch(this.handleError);
   }
 
